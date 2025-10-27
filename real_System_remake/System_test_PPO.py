@@ -22,7 +22,7 @@ import torch.nn.functional as F
 
 use_wandb = True
 use_rbtree = False
-lim_day = 500
+lim_day = 200
 enterprise_ppo_config = Config_PPO(
     scope='',
     state_dim=0,
