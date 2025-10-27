@@ -71,11 +71,11 @@ class PPO:
         else:
             self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=self.learning_rate_actor_enterprise)
             self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=self.learning_rate_critic_enterprise)
-        # self.actor_scheduler = LinearLR(
-        #     self.actor_optimizer,
-        #     start_factor=1.0,
-        #     end_factor=0.3,
-        #     total_iters=config.total_update)
+        self.actor_scheduler = LinearLR(
+            self.actor_optimizer,
+            start_factor=1.0,
+            end_factor=0.3,
+            total_iters=config.total_update)
 
     def set_global_seed(self, seed):
         # pytorch_seed
@@ -274,15 +274,15 @@ class PPO:
                    # print(f"[{agent_type}] Epoch {epoch + 1}/{self.epochs}: "
                        #   f"KL={approx_kl:.4f} > 0.1, 早停")
                   #  break
-        # if self.actor_scheduler.last_epoch < self.actor_scheduler.total_iters:
-        #     self.actor_scheduler.step()
-        #
-        # # === 模拟退火式 熵衰减 ===
-        # progress = self.actor_scheduler.last_epoch / self.actor_scheduler.total_iters
-        # decay_factor = max(0.0, 1.0 - progress)
-        # self.entropyRC_Enterprise = self.entropy_start_enterprise * (0.32 + 0.68 * decay_factor)
-        # self.entropyRC_Bank = self.entropy_start_bank * (0.32 + 0.68 * decay_factor)
-        # 【新增】诊断
+        if self.actor_scheduler.last_epoch < self.actor_scheduler.total_iters:
+            self.actor_scheduler.step()
+
+        # === 模拟退火式 熵衰减 ===
+        progress = self.actor_scheduler.last_epoch / self.actor_scheduler.total_iters
+        decay_factor = max(0.0, 1.0 - progress)
+        self.entropyRC_Enterprise = self.entropy_start_enterprise * (0.3 + 0.7 * decay_factor)
+        self.entropyRC_Bank = self.entropy_start_bank * (0.3 + 0.7 * decay_factor)
+        #【新增】诊断
         self.diagnose(old_states_tensor, old_actions, old_logprobs, agent_type)
 
     def get_loss(self):
@@ -312,10 +312,8 @@ class PPO:
         with torch.no_grad():
             # 1. Actor 分布参数
             mu, std = self.actor(old_states_tensor)
-            #训练后的策略，对训练数据（旧状态）重新预测时的标准差均值
             log_std_mean = torch.log(std).mean().item()
             v_pred = self.critic(old_states_tensor).squeeze(-1)
-            #训练后的价值网络，对训练数据（旧状态）重新估值时的平均值和标准差
             v_mean =v_pred.mean().item()
             v_std = v_pred.std().item()
 

@@ -22,7 +22,7 @@ import torch.nn.functional as F
 
 use_wandb = True
 use_rbtree = False
-lim_day = 200
+lim_day = 100
 enterprise_ppo_config = Config_PPO(
     scope='',
     state_dim=0,
@@ -83,7 +83,7 @@ class System:
 
     def run(self):
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
-        wandb.init(project="PPO_limday500", workspace="wx829", config={
+        wandb.init(project="seed_explore", workspace="829119", config={
             "random_seed": config.random_seed,
             "is_rms_state": config.is_rms_state,
             "is_rms_reward": config.is_rms_reward,
