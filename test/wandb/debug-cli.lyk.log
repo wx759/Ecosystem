@@ -1,0 +1,2 @@
+2024-05-15 20:41:06 ERROR dropped chunk HTTPSConnectionPool(host='api.wandb.ai', port=443): Max retries exceeded with url: /files/anna2022/reward_analysis/njpv2v02/file_stream (Caused by SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:852)'),))
+NoneType: None

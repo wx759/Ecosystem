@@ -1,0 +1,17 @@
+﻿  stdafx.cpp
+  dllmain.cpp
+  er_kernel.cpp
+D:\Cortex22_Anna\Agent\cpp\src\er_kernel\er_kernel\er_kernel.cpp(350,71): warning C4267: “return”: 从“size_t”转换到“INT32”，可能丢失数据
+D:\Cortex22_Anna\Agent\cpp\src\er_kernel\er_kernel\er_kernel.cpp(434,20): warning C4018: “<”: 有符号/无符号不匹配
+D:\Cortex22_Anna\Agent\cpp\src\er_kernel\er_kernel\er_kernel.cpp(464,24): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+  PickSelector.cpp
+  PS_greedy_bin_heap.cpp
+D:\Cortex22_Anna\Agent\cpp\src\er_kernel\er_kernel\er_kernel.h(74,1): warning C4267: “初始化”: 从“size_t”转换到“H_PS_T”，可能丢失数据
+D:\Cortex22_Anna\Agent\cpp\src\er_kernel\er_kernel\PS_greedy_bin_heap.cpp(78): message : 查看对正在编译的函数 模板 实例化“H_PS_T ex_rp_new_pick_selector<PS_Greedy_Bin_Heap>(PTR)”的引用
+  PS_greedy_rb_tree.cpp
+D:\Cortex22_Anna\Agent\cpp\src\er_kernel\er_kernel\er_kernel.h(74,1): warning C4267: “初始化”: 从“size_t”转换到“H_PS_T”，可能丢失数据
+D:\Cortex22_Anna\Agent\cpp\src\er_kernel\er_kernel\PS_greedy_rb_tree.cpp(86): message : 查看对正在编译的函数 模板 实例化“H_PS_T ex_rp_new_pick_selector<PS_Greedy_RB_Tree>(PTR)”的引用
+  WeightedVector.cpp
+  正在生成代码...
+    正在创建库 D:\Cortex22_Anna\Agent\cpp\src\er_kernel\x64\Debug\er_kernel.lib 和对象 D:\Cortex22_Anna\Agent\cpp\src\er_kernel\x64\Debug\er_kernel.exp
+  er_kernel.vcxproj -> D:\Cortex22_Anna\Agent\cpp\src\er_kernel\x64\Debug\er_kernel.dll

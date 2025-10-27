@@ -1,0 +1,317 @@
+﻿  PS_greedy_bin_heap.cpp
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_bin_heap.cpp(16): warning C4244: “初始化”: 从“LH_REC_T”转换到“unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_bin_heap.cpp(19): warning C4244: “参数”: 从“LH_REC_T”转换到“size_t”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(109): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const unsigned int”，可能丢失数据
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(108): note: 编译 类 模板 成员函数 "void WeightedVector<PRIORITY_T,char>::set_weight(WeightedVector<PRIORITY_T,char>::id_t,const weight_t &)" 时
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_bin_heap.cpp(31): note: 参见对正在编译的函数 模板 实例化“void WeightedVector<PRIORITY_T,char>::set_weight(WeightedVector<PRIORITY_T,char>::id_t,const weight_t &)”的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_bin_heap.h(7): note: 参见对正在编译的 类 模板 实例化 "WeightedVector<PRIORITY_T,char>" 的引用
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(110): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(149): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const int”，可能丢失数据
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(141): note: 编译 类 模板 成员函数 "void WeightedVector<PRIORITY_T,char>::remove_tail(WeightedVector<PRIORITY_T,char>::id_t)" 时
+  c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_bin_heap.cpp(43): note: 参见对正在编译的函数 模板 实例化“void WeightedVector<PRIORITY_T,char>::remove_tail(WeightedVector<PRIORITY_T,char>::id_t)”的引用
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(150): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(151): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(157): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const unsigned int”，可能丢失数据
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(156): note: 编译 类 模板 成员函数 "void WeightedVector<PRIORITY_T,char>::exchange(WeightedVector<PRIORITY_T,char>::id_t,WeightedVector<PRIORITY_T,char>::id_t)" 时
+  c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_bin_heap.cpp(47): note: 参见对正在编译的函数 模板 实例化“void WeightedVector<PRIORITY_T,char>::exchange(WeightedVector<PRIORITY_T,char>::id_t,WeightedVector<PRIORITY_T,char>::id_t)”的引用
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(158): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(159): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(160): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(161): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(162): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(163): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(164): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(165): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::id_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(189): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(177): note: 编译 类 模板 成员函数 "WeightedVector<PRIORITY_T,char>::id_t WeightedVector<PRIORITY_T,char>::top_n_at(WeightedVector<PRIORITY_T,char>::id_t,WeightedVector<PRIORITY_T,char>::id_t *)" 时
+  c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_bin_heap.cpp(27): note: 参见对正在编译的函数 模板 实例化“WeightedVector<PRIORITY_T,char>::id_t WeightedVector<PRIORITY_T,char>::top_n_at(WeightedVector<PRIORITY_T,char>::id_t,WeightedVector<PRIORITY_T,char>::id_t *)”的引用
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(191): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(198): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(34): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(33): note: 编译 类 模板 成员函数 "void WeightedVector<PRIORITY_T,char>::_swap(WeightedVector<PRIORITY_T,char>::pos_t,WeightedVector<PRIORITY_T,char>::pos_t)" 时
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(146): note: 参见对正在编译的函数 模板 实例化“void WeightedVector<PRIORITY_T,char>::_swap(WeightedVector<PRIORITY_T,char>::pos_t,WeightedVector<PRIORITY_T,char>::pos_t)”的引用
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(84): note: 编译 类 模板 成员函数 "WeightedVector<PRIORITY_T,char>::id_t WeightedVector<PRIORITY_T,char>::size(void)" 时
+  c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_bin_heap.cpp(12): note: 参见对正在编译的函数 模板 实例化“WeightedVector<PRIORITY_T,char>::id_t WeightedVector<PRIORITY_T,char>::size(void)”的引用
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(35): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(36): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(37): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(38): warning C4244: “参数”: 从“_Ty2”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              _Ty2=WeightedVector<PRIORITY_T,char>::id_t
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(39): warning C4244: “参数”: 从“_Ty2”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              _Ty2=WeightedVector<PRIORITY_T,char>::id_t
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(47): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(44): note: 编译 类 模板 成员函数 "WeightedVector<PRIORITY_T,char>::pos_t WeightedVector<PRIORITY_T,char>::_move_up(WeightedVector<PRIORITY_T,char>::pos_t)" 时
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(135): note: 参见对正在编译的函数 模板 实例化“WeightedVector<PRIORITY_T,char>::pos_t WeightedVector<PRIORITY_T,char>::_move_up(WeightedVector<PRIORITY_T,char>::pos_t)”的引用
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(97): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(96): note: 编译 类 模板 成员函数 "void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::set_value(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t,const value_t &)" 时
+          with
+          [
+              weight_t=PRIORITY_T,
+              value_t=WeightedVector<PRIORITY_T,char>::pos_t
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(188): note: 参见对正在编译的函数 模板 实例化“void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::set_value(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t,const value_t &)”的引用
+          with
+          [
+              weight_t=PRIORITY_T,
+              value_t=WeightedVector<PRIORITY_T,char>::pos_t
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(178): note: 参见对正在编译的 类 模板 实例化 "WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>" 的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(177): note: 编译 类 模板 成员函数 "WeightedVector<PRIORITY_T,char>::id_t WeightedVector<PRIORITY_T,char>::top_n_at(WeightedVector<PRIORITY_T,char>::id_t,WeightedVector<PRIORITY_T,char>::id_t *)" 时
+  c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_bin_heap.cpp(27): note: 参见对正在编译的函数 模板 实例化“WeightedVector<PRIORITY_T,char>::id_t WeightedVector<PRIORITY_T,char>::top_n_at(WeightedVector<PRIORITY_T,char>::id_t,WeightedVector<PRIORITY_T,char>::id_t *)”的引用
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(103): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(102): note: 编译 类 模板 成员函数 "const value_t &WeightedVector<weight_t,value_t>::get_value(WeightedVector<weight_t,value_t>::id_t)" 时
+          with
+          [
+              value_t=WeightedVector<PRIORITY_T,char>::pos_t,
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(184): note: 参见对正在编译的函数 模板 实例化“const value_t &WeightedVector<weight_t,value_t>::get_value(WeightedVector<weight_t,value_t>::id_t)”的引用
+          with
+          [
+              value_t=WeightedVector<PRIORITY_T,char>::pos_t,
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(109): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(108): note: 编译 类 模板 成员函数 "void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::set_weight(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t,const weight_t &)" 时
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(189): note: 参见对正在编译的函数 模板 实例化“void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::set_weight(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t,const weight_t &)”的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(110): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(149): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(141): note: 编译 类 模板 成员函数 "void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::remove_tail(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t)" 时
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(196): note: 参见对正在编译的函数 模板 实例化“void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::remove_tail(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t)”的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(150): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(151): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(157): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(156): note: 编译 类 模板 成员函数 "void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::exchange(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t,WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t)" 时
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(195): note: 参见对正在编译的函数 模板 实例化“void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::exchange(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t,WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t)”的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(158): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(159): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(160): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(161): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(162): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(163): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(164): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(165): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(63): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(56): note: 编译 类 模板 成员函数 "WeightedVector<PRIORITY_T,char>::pos_t WeightedVector<PRIORITY_T,char>::_move_down(WeightedVector<PRIORITY_T,char>::pos_t,WeightedVector<PRIORITY_T,char>::pos_t)" 时
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(79): note: 参见对正在编译的函数 模板 实例化“WeightedVector<PRIORITY_T,char>::pos_t WeightedVector<PRIORITY_T,char>::_move_down(WeightedVector<PRIORITY_T,char>::pos_t,WeightedVector<PRIORITY_T,char>::pos_t)”的引用
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(19): note: 编译 类 模板 成员函数 "WeightedVector<PRIORITY_T,char>::pos_t *WeightedVector<PRIORITY_T,char>::_array_P(void)" 时
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(142): note: 参见对正在编译的函数 模板 实例化“WeightedVector<PRIORITY_T,char>::pos_t *WeightedVector<PRIORITY_T,char>::_array_P(void)”的引用
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(64): warning C4244: “参数”: 从“WeightedVector<PRIORITY_T,char>::pos_t”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(34): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(33): note: 编译 类 模板 成员函数 "void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::_swap(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t,WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t)" 时
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(146): note: 参见对正在编译的函数 模板 实例化“void WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::_swap(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t,WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t)”的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(84): note: 编译 类 模板 成员函数 "WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::size(void)" 时
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(194): note: 参见对正在编译的函数 模板 实例化“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::id_t WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::size(void)”的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(35): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(36): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(37): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(47): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(44): note: 编译 类 模板 成员函数 "WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::_move_up(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t)" 时
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(135): note: 参见对正在编译的函数 模板 实例化“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::_move_up(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t)”的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(63): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(56): note: 编译 类 模板 成员函数 "WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::_move_down(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t,WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t)" 时
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(79): note: 参见对正在编译的函数 模板 实例化“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::_move_down(WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t,WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t)”的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(19): note: 编译 类 模板 成员函数 "WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t *WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::_array_P(void)" 时
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(142): note: 参见对正在编译的函数 模板 实例化“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t *WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::_array_P(void)”的引用
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+c:\users\30800\desktop\er_kernel\er_kernel\weightedvector.cpp(64): warning C4244: “参数”: 从“WeightedVector<weight_t,WeightedVector<weight_t,char>::pos_t>::pos_t”转换到“const unsigned int”，可能丢失数据
+          with
+          [
+              weight_t=PRIORITY_T
+          ]
+  PS_greedy_rb_tree.cpp
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_rb_tree.cpp(24): warning C4244: “参数”: 从“LH_REC_T”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_rb_tree.cpp(25): warning C4244: “参数”: 从“LH_REC_T”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_rb_tree.cpp(34): warning C4244: “参数”: 从“LH_REC_T”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_rb_tree.cpp(45): warning C4244: “参数”: 从“LH_REC_T”转换到“const int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_rb_tree.cpp(47): warning C4244: “参数”: 从“LH_REC_T”转换到“const int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_rb_tree.cpp(51): warning C4244: “参数”: 从“LH_REC_T”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_rb_tree.cpp(52): warning C4244: “参数”: 从“LH_REC_T”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_rb_tree.cpp(53): warning C4244: “参数”: 从“LH_REC_T”转换到“const unsigned int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\ps_greedy_rb_tree.cpp(54): warning C4244: “参数”: 从“LH_REC_T”转换到“const unsigned int”，可能丢失数据
+  PickSelector.cpp
+  WeightedVector.cpp
+  er_kernel.cpp
+c:\users\30800\desktop\er_kernel\er_kernel\er_kernel.cpp(324): warning C4244: “参数”: 从“LH_REC_T”转换到“const int”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\er_kernel.cpp(383): warning C4244: “参数”: 从“UINT64”转换到“size_t”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\er_kernel.cpp(384): warning C4244: “参数”: 从“UINT64”转换到“size_t”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\er_kernel.cpp(385): warning C4244: “参数”: 从“UINT64”转换到“size_t”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\er_kernel.cpp(387): warning C4244: “参数”: 从“UINT64”转换到“size_t”，可能丢失数据
+c:\users\30800\desktop\er_kernel\er_kernel\er_kernel.cpp(56): warning C4244: “参数”: 从“UINT64”转换到“size_t”，可能丢失数据
+  c:\users\30800\desktop\er_kernel\er_kernel\er_kernel.cpp(124): note: 参见对正在编译的函数 模板 实例化“char *SERIALIZE_VECTOR<ACTION_T>(char *,std::vector<STATE_T,std::allocator<_Ty>> &)”的引用
+          with
+          [
+              _Ty=STATE_T
+          ]
+  正在生成代码...
+    正在创建库 C:\Users\30800\Desktop\er_kernel\Debug\er_kernel.lib 和对象 C:\Users\30800\Desktop\er_kernel\Debug\er_kernel.exp
+  er_kernel.vcxproj -> C:\Users\30800\Desktop\er_kernel\Debug\er_kernel.dll
