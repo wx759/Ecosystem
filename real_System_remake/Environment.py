@@ -46,6 +46,8 @@ class Environment:
                  day_max: int = 0,
                  day_sum_smooth: int = 0):
 
+        self.logger = None
+        self.reward = None
         self.day_sum_smooth = day_sum_smooth
         self.use_wandb = False
         if self.use_wandb:
@@ -119,7 +121,7 @@ class Environment:
     def init(self):
         self.market = Market('market')
         self.trade_time = len(self.Enterprise.keys()) // 2
-        # self.logger = Logger(name=self.name, base_path=self.logger_path)
+        self.logger = Logger(name=self.name, base_path=self.logger_path)
 
         for key in self.Enterprise:
             self.Enterprise[key].init(shop_dir=self.shop_dir,
@@ -250,15 +252,14 @@ class Environment:
                 self.eday[self.episode] = self.day
             # 统计结束数据
             for key in self.action_controller['e_execute']:
-                # self.logger.receive_finish_enterprise(episode=self.episode, day=self.day, target=self.Enterprise[key])
-
+                self.logger.receive_finish_enterprise(episode=self.episode, day=self.day, target=self.Enterprise[key])
                 print('after', self.Enterprise[key].total_reward)
-            print('after', self.Bank[self.action_controller['b_execute'][0]].total_reward)
-            # for key in self.action_controller['b_execute']:
-            #     self.logger.receive_finish_bank(episode=self.episode, day=self.day, target=self.Bank[key])
+            for key in self.action_controller['b_execute']:
+                self.logger.receive_finish_bank(episode=self.episode, day=self.day, target=self.Bank[key])
+                print('after', self.Bank[self.action_controller['b_execute'][0]].total_reward)
             # if self.use_wandb:
-            #     if self.episode % 100 == 0 and self.episode > 0:
-            #         self.logger.wandb_log(epi=self.episode)
+            if self.episode % 100 == 0 and self.episode > 0:
+                    self.logger.wandb_log(epi=self.episode)
         info ={
             'terminated': self.terminated,
             'truncated': self.truncated,
@@ -345,6 +346,7 @@ class Environment:
         for key in self.action_controller['b_execute']:
             self.Bank[key].custom_reward(self.day,self.lim_day)
             reward[key] = self.Bank[key].get_reward()
+        # 这里返回的是加了生存奖励的reward
         self.reward = reward
 
         # 自然终止（破产）

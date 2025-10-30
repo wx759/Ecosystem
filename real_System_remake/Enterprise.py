@@ -46,6 +46,7 @@ class Enterprise:
         self.get_shop = {}  # 当日实际获得产品      类型格式同上
         self.all_shop = {}  # 当日市场所有商品 类型为字典 dict{商品名str,dict{'price':list[1,2,3],'num':list[1,2,3}} 用于训练
         self.reward = None
+        self.reward_train = None
         self.reward_gamma = 0.95
         self.is_fall = False
         self.market_record = {}  # 企业可以观察到市场每一笔交易，记录其中用于训练输入数据
@@ -126,6 +127,8 @@ class Enterprise:
         self.total_reward = {'economy': 0, 'business': 0}
         self.step = 0
         self.total_sales = 0
+        self.reward = None
+        self.reward_train = None
 
         for key in self.shop_dir:
             self.intention_policy[key] = self.config.intention
@@ -361,11 +364,12 @@ class Enterprise:
         self.reward['business'] = self.revenue / 100
 
         # 平滑延长奖励：从80%开始增长，最高放大到1.5倍
+        self.reward_train = self.reward.copy()
         progress = day / lim_day
         if progress > 0.8:
             bonus_factor = (progress - 0.8) * 0.5  # 在80%→100%之间线性增至0.1倍
-            self.reward['economy'] *= (1 + bonus_factor)
-            self.reward['business'] *= (1 + bonus_factor)
+            self.reward_train['economy'] = (1 + bonus_factor) * self.reward['economy']
+            self.reward_train['business'] = (1 + bonus_factor) * self.reward['business']
 
         # 最终生存奖励 目前最优情况
         # if day == lim_day -2 :
@@ -373,8 +377,8 @@ class Enterprise:
         #     self.reward['business'] += lim_day * 0.2 / 80
 
         if day == lim_day -2 :
-            self.reward['economy'] += lim_day * 0.2 / 80 # 额外奖
-            self.reward['business'] += lim_day * 0.2 / 80
+            self.reward_train['economy'] += lim_day * 0.2 / 80 # 额外奖
+            self.reward_train['business'] += lim_day * 0.2 / 80
 
         return self.reward
 
@@ -404,7 +408,7 @@ class Enterprise:
         for key in self.total_reward:
             self.total_reward[key] += self.reward[key] * decay
         self.step += 1
-        return self.reward
+        return self.reward_train
 
     # def get_fail_reward(self, day, lim_day):
     #     reward = {}

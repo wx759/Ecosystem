@@ -30,10 +30,10 @@ class Bank:
         self.observation = {}                # 银行对企业的观察，为引用传递，设定完观察无需修改
         self.loss = {}
         self.reward = {}
-
+        self.reward_train = {}
         # 以上为数据，以下为参数
         self.debt_time = config.debt_time
-        self.debet_i = config.debt_i
+        self.debt_i = config.debt_i
         self.fund = self.config.fund                     # 银行储备金
         self.fund_rate = config.fund_rate           # 储备金率，银行总共可以放出的贷款额度为 sum(bond) <= fund_rate * (fund + money)
         self.fund_increase = config.fund_increase   # 储备金每回合增长，即 fund = fund * (1 + fund_increase) ^ day
@@ -65,6 +65,7 @@ class Bank:
         self.should_payback = {}  # 当日待还款数值 {(主体名:str,待还款:float)}
         self.loss = {}
         self.reward = {}
+        self.reward_train = {}
         self.total_reward = {'WNDB': 0}
         self.step = 0
 
@@ -121,7 +122,7 @@ class Bank:
 
     def answer_debt(self, name: str, day):   # 回合开始由企业询问该回合待还款本金和待还款利息
         self.should_payback[name] = self.bond_detail[name][day % self.debt_time]  # 记录下当日待还款
-        return {'money': round(self.should_payback[name], 2), 'iD':round(self.debet_i * self.bond[name], 2)}
+        return {'money': round(self.should_payback[name], 2), 'iD':round(self.debt_i * self.bond[name], 2)}
 
     def deal_payback(self, name:str, payback: dict):   # 处理来自企业的还款
         self.debt[name] = round(self.debt[name] - payback['payback'], 2)      # 银行收回现金，银行对企业债务减一笔
@@ -174,14 +175,15 @@ class Bank:
     def custom_reward(self, day, lim_day):
         self.reward['WNDB'] = self.profit / 100
         # 平滑延长奖励：从80%开始增长，最高放大到1.5倍
+        self.reward_train = self.reward.copy()
         progress = day / lim_day
         if progress > 0.8:
             bonus_factor = (progress - 0.8) * 0.5  # 在80%→100%之间线性增至0.1倍
-            self.reward['WNDB'] *= (1 + bonus_factor)
+            self.reward_train['WNDB'] =(1 + bonus_factor) * self.reward['WNDB']
 
         # 最终生存奖励
         if day == lim_day -2 :
-            self.reward['WNDB'] += lim_day * 0.2 / 80 # 额外奖
+            self.reward_train['WNDB'] += lim_day * 0.2 / 80 # 额外奖
 
         return self.reward
 
@@ -231,7 +233,7 @@ class Bank:
         for key in self.total_reward:
             self.total_reward[key] += self.reward[key] * decay
         self.step += 1
-        return self.reward
+        return self.reward_train
 
 
     def get_fail_reward(self):

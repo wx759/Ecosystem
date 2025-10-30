@@ -8,7 +8,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import time
 import shutil
 from pandas import DataFrame
-import wandb as wandb
+import swanlab as wandb
 
 
 plt.rcParams["font.sans-serif"]=["SimHei"] #设置字体
@@ -334,51 +334,51 @@ class Logger:
         plt.legend()
         self.output_graph('百回合累计奖励_银行', save_path=path,xlabel='回合/100',ylabel='平均累计奖励/1000')
 
-    # def wandb_log(self,start_at:int=0,epi = None):
-    #     # 每百回合生存天数
-    #     day = self.data['enterprise']['finish']['消费企业1']['天数'][start_at:]
-    #     count = 0
-    #     start = epi-100
-    #     end = epi
-    #     for i in range(start,end):
-    #         count += day[i]
-    #     res = count/100
-    #     wandb.log({'每百回合/存活天数':res})
-    #
-    #     # 每百回合累计奖励
-    #     #   enterprise
-    #     reward_name_list = ['累计奖励_business']
-    #     target_name_list = ['生产企业1', '消费企业1', '生产企业2', '消费企业2']
-    #     enterprise_reward_mul = 100
-    #     try:
-    #         for reward_name in reward_name_list:
-    #             for target_name in target_name_list:
-    #                 reward = self.data['enterprise']['finish'][target_name][reward_name][start_at:]
-    #                 count = 0
-    #                 for i in range(start,end):
-    #                     count += (reward[i] * enterprise_reward_mul)
-    #                 res = count/100
-    #                 if target_name == '生产企业1':
-    #                     wandb.log({'每百回合/累计奖励/生产企业1':res})
-    #                 elif target_name == '消费企业1':
-    #                     wandb.log({'每百回合/累计奖励/消费企业1': res})
-    #                 elif target_name == '生产企业2':
-    #                     wandb.log({'每百回合/累计奖励/生产企业2':res})
-    #                 else:
-    #                     wandb.log({'每百回合/累计奖励/消费企业2': res})
-    #     except KeyError:
-    #         pass
-    #     #    bank
-    #     bank_reward_mul = 100
-    #     reward = self.data['bank']['finish']['银行']['累计奖励_借贷意愿'][start_at:]
-    #     count = 0
-    #     for i in range(start,end):
-    #         count += (reward[i] * bank_reward_mul)
-    #     if count < 0:
-    #         res = count / 1000
-    #     else:
-    #         res = count / 100
-    #     wandb.log({'每百回合/累计奖励/银行':res})
+    def wandb_log(self,start_at:int=0,epi = None):
+        # # 每百回合生存天数
+        # day = self.data['enterprise']['finish']['消费企业1']['天数'][start_at:]
+        # count = 0
+        start = epi-100
+        end = epi
+        # for i in range(start,end):
+        #     count += day[i]
+        # res = count/100
+        # wandb.log({'每百回合/存活天数':res})
+
+        # 每百回合累计奖励
+        #   enterprise
+        reward_name_list = ['累计奖励_business']
+        target_name_list = ['生产企业1', '消费企业1', '生产企业2', '消费企业2']
+        enterprise_reward_mul = 100
+        try:
+            for reward_name in reward_name_list:
+                for target_name in target_name_list:
+                    reward = self.data['enterprise']['finish'][target_name][reward_name][start_at:]
+                    count = 0
+                    for i in range(start,end):
+                        count += (reward[i] * enterprise_reward_mul)
+                    res = count/100
+                    if target_name == '生产企业1':
+                        wandb.log({'每百回合/累计奖励/生产企业1':res})
+                    elif target_name == '消费企业1':
+                        wandb.log({'每百回合/累计奖励/消费企业1': res})
+                    elif target_name == '生产企业2':
+                        wandb.log({'每百回合/累计奖励/生产企业2':res})
+                    else:
+                        wandb.log({'每百回合/累计奖励/消费企业2': res})
+        except KeyError:
+            pass
+        #    bank
+        bank_reward_mul = 100
+        reward = self.data['bank']['finish']['银行']['累计奖励_借贷意愿'][start_at:]
+        count = 0
+        for i in range(start,end):
+            count += (reward[i] * bank_reward_mul)
+        if count < 0:
+            res = count / 1000
+        else:
+            res = count / 100
+        wandb.log({'每百回合/累计奖励/银行':res})
 
 
     def output_discount(self,target:str,data_name:str, start_at:int = 0, path:str = None, type:str = 'finish',agent_type:str = 'enterprise'):
