@@ -366,6 +366,11 @@ class Enterprise:
         # 平滑延长奖励：从80%开始增长，最高放大到1.5倍
         self.reward_train = self.reward.copy()
         progress = day / lim_day
+        # if progress > 0.8:
+        #     bonus_factor = (progress - 0.8) * 0.5  # 在80%→100%之间线性增至0.1倍
+        #     self.reward_train['economy'] = (1 + bonus_factor) * self.reward['economy']
+        #     self.reward_train['business'] = (1 + bonus_factor) * self.reward['business']
+
         if progress > 0.8:
             bonus_factor = (progress - 0.8) * 0.5  # 在80%→100%之间线性增至0.1倍
             self.reward_train['economy'] = (1 + bonus_factor) * self.reward['economy']

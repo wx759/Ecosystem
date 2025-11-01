@@ -82,9 +82,10 @@ class System:
             self.Agent[key] = None
 
     def run(self):
+        seed = random.randint(0, 1000)
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
-        wandb.init(project="seed_explore", workspace="829119", config={
-            "random_seed": config.random_seed,
+        wandb.init(project="TD3_vs_PPO", workspace="wx829", config={
+            "random_seed": seed,
             "is_rms_state": config.is_rms_state,
             "is_rms_reward": config.is_rms_reward,
             "max_training_steps": config.MAX_TRAINING_STEPS,
@@ -112,12 +113,14 @@ class System:
             if self.Agent[target_key] is None:
                 config = copy.deepcopy(enterprise_ppo_config)
                 config.set_scope(target_key)
+                config.set_seed(seed)
                 config.set_state_dim(len(_temp_state[target_key]))
                 self.Agent[target_key] = enterprise_nnu(config)
         for target_key in self.b_execute:
             if self.Agent[target_key] is None:
                 config = copy.deepcopy(bank_ppo_config)
                 config.set_scope(target_key)
+                config.set_seed(seed)
                 config.set_state_dim(len(_temp_state[target_key]))
                 self.Agent[target_key] = bank_nnu(config)
 

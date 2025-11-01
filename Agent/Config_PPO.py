@@ -20,7 +20,7 @@ class Config_PPO:
                  # PPO核心参数
                  update_timestep: int = 2048,
                  max_training_steps: int = 2000000,
-                 total_step: int = 5000000,
+                 total_step: int = 3000000,
 
                  clip_range: float = 0.1,
                  n_epochs: int = 8,
@@ -33,7 +33,7 @@ class Config_PPO:
                  is_rms_reward: bool = True,
 
                  # 随机种子
-                 random_seed: int = 105,
+                 random_seed: int = None,
                  ):
         self.total_step = total_step
         self.entropyRC_Bank = entropy_bank
@@ -60,10 +60,8 @@ class Config_PPO:
         # self.entropyRC = entropyRC
         self.total_update = max_training_steps / update_timestep
         # 随机种子
-        if random_seed is None:
-            self.random_seed = random.randint(1, 1000)  # 给一个固定默认值，或者 None
-        else:
-            self.random_seed = random_seed
+        self.random_seed = random_seed
+
         self.is_rms_state = is_rms_state
         self.is_rms_reward = is_rms_reward
 
@@ -75,3 +73,6 @@ class Config_PPO:
 
     def __str__(self):
         return "\n".join([f"{k: <20}: {v}" for k, v in self.__dict__.items()])
+
+    def set_seed(self,seed: int):
+        self.random_seed = seed

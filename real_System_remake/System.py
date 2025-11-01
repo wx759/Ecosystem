@@ -142,7 +142,7 @@ class System:
                 self.epiday=self.epiday+1
 
                 self.env.step(action)
-                next_state,reward,done = self.env.observe()
+                next_state,reward,done,_= self.env.observe()
 
                 # done的情况下，因为已知state 和 state_，reward为破产惩罚，处理逻辑不需要时序错峰
                 if done:
