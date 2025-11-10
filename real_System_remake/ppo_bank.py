@@ -29,8 +29,8 @@ class bank_nnu:
 
         return action
 
-    def store_transition(self, state, action, logprob, reward, is_terminal, next_value, nonterminal):  # CHANGED
-        self.bank.store_transition(state, action, logprob, reward, is_terminal, next_value, nonterminal)
+    def store_transition(self, state,mu,sigma,action, logprob, reward, is_terminal, next_value, nonterminal):  # CHANGED
+        self.bank.store_transition(state,mu,sigma,action, logprob, reward, is_terminal, next_value, nonterminal)
 
     def get_value(self, state):  # NEW
         return self.bank.get_value(state)

@@ -34,6 +34,8 @@ class PPO:
         # 缓冲区列表
         self.states = []
         self.actions = []
+        self.mus = []  # NEW: 缓存采样时的 mu_old
+        self.stds = []  # NEW: 缓存采样时的 std_old        self.actions = []
         self.logprobs = []
         self.rewards = []
         self.is_terminals = []
@@ -113,10 +115,12 @@ class PPO:
             correction = self.action_dim * torch.log(torch.tensor(0.5))
             log_prob = log_prob - log_det_jacobian - correction
 
-        return action.cpu().numpy().flatten(), log_prob.cpu().item()
+        return action.cpu().numpy().flatten(), log_prob.cpu().item(),mu.cpu().numpy().flatten(), sigma.cpu().numpy().flatten()
 
-    def store_transition(self, state, action, logprob, reward, is_terminal, next_value, nonterminal):  # CHANGED
+    def store_transition(self,state,mu,sigma, action,logprob, reward, is_terminal, next_value, nonterminal):  # CHANGED
         self.states.append(state)
+        self.mus.append(mu)
+        self.stds.append(sigma)
         self.actions.append(action)
         self.logprobs.append(logprob)
         self.rewards.append(reward)
@@ -126,6 +130,8 @@ class PPO:
 
     def clear_memory(self):
         del self.states[:]
+        del self.mus[:]
+        del self.stds[:]
         del self.actions[:]
         del self.logprobs[:]
         del self.rewards[:]
@@ -164,7 +170,9 @@ class PPO:
         old_states_tensor = torch.tensor(normalized_old_states_np, dtype=torch.float).to(self.device)
         old_actions = torch.tensor(np.array(self.actions), dtype=torch.float).to(self.device)
         old_logprobs = torch.tensor(self.logprobs, dtype=torch.float).to(self.device)
-
+        # NEW: 把采样时缓存的 mu/std 也做成 tensor
+        old_mu_tensor = torch.tensor(np.array(self.mus), dtype=torch.float, device=self.device)
+        old_std_tensor = torch.tensor(np.array(self.stds), dtype=torch.float, device=self.device)
         # GAE 计算
         state_values = self.critic(old_states_tensor).squeeze().detach()
         values = state_values.tolist()
@@ -187,7 +195,8 @@ class PPO:
 
         returns = (advantages + state_values).detach()
 
-        # advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+        advantages = torch.clamp(advantages, -10.0, 10.0)
 
         # Mini-Batch 训练阶段
         batch_size_total = len(self.states)
@@ -198,6 +207,7 @@ class PPO:
             entropy_list, clip_frac_list = [], []
 
             shuffled_indices = torch.randperm(batch_size_total)
+            stop_all = False  # NEW: 控制两层循环的早停
             for start_idx in range(0, batch_size_total, self.mini_batch_size):
                 end_idx = min(start_idx + self.mini_batch_size, batch_size_total)
                 batch_indices = shuffled_indices[start_idx:end_idx]
@@ -251,6 +261,21 @@ class PPO:
                 # 读取.grad存储的梯度，更新参数
                 self.actor_optimizer.step()
                 self.critic_optimizer.step()
+            #     with torch.no_grad():
+            #         mu_new, std_new = self.actor(old_states_tensor)  # 当前策略参数（全量 old_states）
+            #         kl_samples = self.analytic_gaussian_kl(old_mu_tensor, old_std_tensor, mu_new, std_new)
+            #         kl_mean = kl_samples.mean().item()
+            #         kl_median = kl_samples.median().item()
+            #         kl_95 = float(torch.quantile(kl_samples, 0.95).item())
+            #         # 触发条件可按自己经验调
+            #         if kl_median > 0.02 or kl_mean > 0.03 or kl_95 > 0.08:
+            #             # 可选：临时降学习率，避免下次再猛跳
+            #             # for g in self.actor_optimizer.param_groups:
+            #             #     g['lr'] *= 0.5
+            #             stop_all = True
+            #             break
+            # if stop_all:
+            #         break
 
 
             # 【修改后】保存所有mini-batch损失的平均值，用于日志记录
@@ -260,20 +285,17 @@ class PPO:
             self.avg_entropy = np.mean(entropy_list)
             self.avg_clip_frac = np.mean(clip_frac_list)
             # 👇 ===== KL早停机制 ===== 👇
-          #  with torch.no_grad():
-                # 用更新后的网络重新计算整个batch的log_prob
-               # mu_new, std_new = self.actor(old_states_tensor)
-             #   new_logprobs = self.compute_log_prob(mu_new, std_new, old_actions)
-
-                # 计算KL散度（近似）
-                # D_KL(π_old || π_new) ≈ E[log π_old - log π_new]
-               # approx_kl = (old_logprobs - new_logprobs).mean().item()
-
-                # 如果KL散度超过阈值，提前停止
-                #if approx_kl > 1:  # 阈值可调
-                   # print(f"[{agent_type}] Epoch {epoch + 1}/{self.epochs}: "
-                       #   f"KL={approx_kl:.4f} > 0.1, 早停")
-                  #  break
+            # with torch.no_grad():
+            #     #用更新后的网络重新计算整个batch的log_prob
+            #    mu_new, std_new = self.actor(old_states_tensor)
+            #    new_logprobs = self.compute_log_prob(mu_new, std_new, old_actions)
+            #
+            #    # 计算KL散度（近似） D_KL(π_old || π_new) ≈ E[log π_old - log π_new]
+            #    approx_kl = (old_logprobs - new_logprobs).mean().item()
+            #
+            #    #如果KL散度超过阈值，提前停止
+            #    if approx_kl > 0.05:  # 阈值可调
+            #        break
         if self.actor_scheduler.last_epoch < self.actor_scheduler.total_iters:
             self.actor_scheduler.step()
 
@@ -291,21 +313,38 @@ class PPO:
     def get_test_indicator(self):
         return self.avg_entropy, self.avg_clip_frac
 
-    @staticmethod
-    def compute_log_prob(mu, std, action):
+
+    # def compute_log_prob(self,mu, std, action):
+    #     dist = Normal(mu, std)
+    #     # 动作被限制在 [-0.5, 0.5] 之间, 逆变换是 * 2
+    #     scaled_action = torch.clamp(action * 2.0, -1.0 + 1e-6, 1.0 - 1e-6)
+    #     raw_action = torch.atanh(scaled_action)
+    #
+    #     log_prob_raw = dist.log_prob(raw_action)
+    #     log_det_jacobian = 2 * (torch.log(torch.tensor(2.0)) - raw_action - F.softplus(-2 * raw_action))
+    #
+    #     # 【修改后】与 choose_action 中一样，补上对数缩放因子 log(0.5)。
+    #     # 这里的张量运算是元素级别的，所以直接减去标量即可，PyTorch会自动广播。
+    #     correction = self.action_dim * torch.log(torch.tensor(0.5))
+    #     log_prob = log_prob_raw - log_det_jacobian - correction
+    #
+    #     return log_prob
+    def compute_log_prob(self, mu, std, action):
         dist = Normal(mu, std)
-        # 动作被限制在 [-0.5, 0.5] 之间, 逆变换是 * 2
-        scaled_action = torch.clamp(action * 2.0, -1.0 + 1e-6, 1.0 - 1e-6)
-        raw_action = torch.atanh(scaled_action)
+        scaled = torch.clamp(action * 2.0, -1.0 + 1e-6, 1.0 - 1e-6)
+        z = torch.atanh(scaled)
 
-        log_prob_raw = dist.log_prob(raw_action)
-        log_det_jacobian = 2 * (torch.log(torch.tensor(2.0)) - raw_action - F.softplus(-2 * raw_action))
+        # 逐维 log_prob
+        log_prob_raw_per_dim = dist.log_prob(z)  # [B, D]
+        log_prob_raw = log_prob_raw_per_dim.sum(dim=-1)  # [B]
 
-        # 【修改后】与 choose_action 中一样，补上对数缩放因子 log(0.5)。
-        # 这里的张量运算是元素级别的，所以直接减去标量即可，PyTorch会自动广播。
-        log_prob = log_prob_raw - log_det_jacobian - torch.log(torch.tensor(0.5))
+        # 逐维 Jacobian: log(1 - tanh(z)^2) 的稳定形式
+        jac_per_dim = 2 * (torch.log(torch.tensor(2.0)) - z - F.softplus(-2 * z))
+        log_det = jac_per_dim.sum(dim=-1)  # [B]
 
-        return log_prob.sum(-1)
+        correction = self.action_dim * torch.log(torch.tensor(0.5))
+        log_prob = log_prob_raw - log_det - correction
+        return log_prob  # shape [B]
 
     def diagnose(self, old_states_tensor, old_actions, old_logprobs, agent_type):
         """诊断 PPO 训练过程中的关键指标"""
@@ -352,6 +391,17 @@ class PPO:
             action = torch.tanh(raw_action) * 0.5
 
         return action.cpu().numpy().flatten()
+
+    # NEW: 对角高斯的解析 KL（按样本对动作维度求和）
+    @staticmethod
+    def analytic_gaussian_kl(mu0, std0, mu1, std1):
+        var0 = std0.pow(2)
+        var1 = std1.pow(2)
+        # per-dim KL: log(std1/std0) + (var0 + (mu0-mu1)^2) / (2*var1) - 0.5
+        term1 = torch.log(std1 / std0).sum(dim=-1)
+        term2 = ((var0 + (mu0 - mu1).pow(2)) / (2.0 * var1)).sum(dim=-1)
+        kl = term1 + term2 - 0.5 * mu0.shape[-1]
+        return kl  # shape: [N]
 
 
 class PolicyNet(torch.nn.Module):

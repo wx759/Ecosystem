@@ -29,7 +29,7 @@ class Config_PPO:
                  entropy_bank: float = 0.0035,
 
                  # 设置参数
-                 is_rms_state: bool = True,
+                 is_rms_state: bool = False,
                  is_rms_reward: bool = True,
 
                  # 随机种子

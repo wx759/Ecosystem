@@ -22,7 +22,7 @@ import torch.nn.functional as F
 
 use_wandb = True
 use_rbtree = False
-lim_day = 500
+lim_day = 150
 enterprise_ppo_config = Config_PPO(
     scope='',
     state_dim=0,
@@ -82,7 +82,8 @@ class System:
             self.Agent[key] = None
 
     def run(self):
-        seed = random.randint(0, 1000)
+        # seed = random.randint(0, 1000)
+        seed = 398
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
         wandb.init(project="TD3_vs_PPO", workspace="wx829", config={
             "random_seed": seed,
@@ -135,14 +136,14 @@ class System:
             # --- 数据收集阶段 ---
             for _ in range(update_timestep):
                 time_step += 1
-                action, log_prob = {}, {}
+                action,log_prob,mus,sigmas = {}, {},{},{}
 
                 for target_key in self.e_execute:
-                    act, lp = self.Agent[target_key].choose_action(state[target_key])
-                    action[target_key], log_prob[target_key] = act, lp
+                    act, lp ,mu,sigma= self.Agent[target_key].choose_action(state[target_key])
+                    action[target_key], log_prob[target_key],mus[target_key],sigmas[target_key] = act, lp,mu,sigma
                 for target_key in self.b_execute:
-                    act, lp = self.Agent[target_key].choose_action(state[target_key])
-                    action[target_key], log_prob[target_key] = act, lp
+                    act, lp ,mu,sigma= self.Agent[target_key].choose_action(state[target_key])
+                    action[target_key], log_prob[target_key],mus[target_key],sigmas[target_key] = act, lp,mu,sigma
 
                 self.env.step(action)
                 next_state, reward, done_env,info = self.env.observe()
@@ -162,9 +163,11 @@ class System:
                 for target_key in self.e_execute:
                     self.Agent[target_key].store_transition(
                         state[target_key],
+                        mus[target_key],
+                        sigmas[target_key],
                         action[target_key],
                         log_prob[target_key],
-                        reward[target_key]['business'],
+                        reward[target_key]['days'],
                         is_terminal_for_gae,
                         next_v[target_key],
                         nonterminal,
@@ -172,6 +175,8 @@ class System:
                 for target_key in self.b_execute:
                     self.Agent[target_key].store_transition(
                         state[target_key],
+                        mus[target_key],
+                        sigmas[target_key],
                         action[target_key],
                         log_prob[target_key],
                         reward[target_key]['WNDB'],

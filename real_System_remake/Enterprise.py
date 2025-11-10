@@ -11,6 +11,7 @@ class Enterprise:
     def __init__(self,
                  config: Enterprise_config,
                  ):
+        self.total_sales = None
         self.config = config
         self.action_functiontion = config.action_function  # 决定各个变量的动作方式 类型为字典str:function(),如定义数据K使用方法f为百分比递增，{'K':f}
         self.name = config.name  # 当前主体名称
@@ -52,7 +53,7 @@ class Enterprise:
         self.market_record = {}  # 企业可以观察到市场每一笔交易，记录其中用于训练输入数据
         self.state = []
         self.last_output = 0
-        self.total_reward = {'economy': 0, 'business': 0}
+        self.total_reward = None
         self.reward_decay = 0.95
         self.step = 0
         # 格式 dict{买家名str,dict{卖家名str,dict{'price':价格float,'num':数量float}}}
@@ -124,7 +125,7 @@ class Enterprise:
         self.state = []
         self.loss = {}
         self.last_output = 0
-        self.total_reward = {'economy': 0, 'business': 0}
+        self.total_reward = {'economy': 0, 'business': 0, 'day_profit':0,"eval_business":0,"days":0}
         self.step = 0
         self.total_sales = 0
         self.reward = None
@@ -362,6 +363,9 @@ class Enterprise:
         # 基础部分
         self.reward['economy'] = (self.revenue - self.last_cost) / 100
         self.reward['business'] = self.revenue / 100
+        self.reward['day_profit'] = (self.revenue - self.last_cost + self.economy_profit) / 100
+        self.reward['eval_business'] = (self.revenue * 2 - self.last_cost + self.economy_profit)/100
+        self.reward['days'] = day/10
 
         # 平滑延长奖励：从80%开始增长，最高放大到1.5倍
         self.reward_train = self.reward.copy()
