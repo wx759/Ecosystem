@@ -194,7 +194,7 @@ class System:
 
             # --- 学习阶段 ---
             print(f"--- Timestep {time_step}. Updating policies... ---")
-
+            print("hello world")
             for agent_key, agent in self.Agent.items():
                 agent.learn(state[agent_key])
                 agent.clear_memory()
