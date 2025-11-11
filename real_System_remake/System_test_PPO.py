@@ -91,8 +91,7 @@ class System:
             port=587,
             language="zh",
         )
-        # seed = random.randint(0, 1000)
-        seed = 398
+        seed = random.randint(0, 1000)
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
         wandb.init(project="TD3_vs_PPO", workspace="wx829", config={
             "random_seed": seed,
@@ -138,9 +137,9 @@ class System:
         # 3. 开始训练循环
         state = self.env.reset()
         time_step = 0
-        episode_num = 0
+        episode_num = 1
 
-        while time_step < total_step and episode_num < 30000:
+        while time_step < total_step and episode_num < 255:
 
             # --- 数据收集阶段 ---
             for _ in range(update_timestep):
@@ -233,7 +232,7 @@ class System:
 
             print("--- Update finished. ---")
 
-        print("--- Training finished. Starting evaluation... ---")
+        # print("--- Training finished. Starting evaluation... ---")
         # for i in range(100):
         #     avg_len_det = self.evaluate_policy(episodes=10)
         #     wandb.log({"eval/final_avg_len_det": avg_len_det})
