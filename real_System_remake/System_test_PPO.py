@@ -140,7 +140,7 @@ class System:
         time_step = 0
         episode_num = 0
 
-        while time_step < total_step:
+        while time_step < total_step and episode_num < 30000:
 
             # --- 数据收集阶段 ---
             for _ in range(update_timestep):
@@ -197,13 +197,14 @@ class System:
                 state = next_state
 
                 if done_env:
+                    print(f"Episode {episode_num} finished. Total timesteps: {time_step}")
                     state = self.env.reset()
                     episode_num += 1
-                    print(f"Episode {episode_num} finished. Total timesteps: {time_step}")
+
 
             # --- 学习阶段 ---
             print(f"--- Timestep {time_step}. Updating policies... ---")
-            print("hello world")
+
             for agent_key, agent in self.Agent.items():
                 agent.learn(state[agent_key])
                 agent.clear_memory()
