@@ -19,7 +19,7 @@ from real_System_remake.ppo_enterprise import enterprise_nnu
 import torch
 from torch.distributions import Normal
 import torch.nn.functional as F
-
+from swanlab.plugin.notification import EmailCallback
 use_wandb = True
 use_rbtree = False
 lim_day = 150
@@ -82,6 +82,15 @@ class System:
             self.Agent[key] = None
 
     def run(self):
+        # 初始化邮件通知插件
+        email_callback = EmailCallback(
+            sender_email="1430074565@qq.com",
+            receiver_email="1430074565@qq.com",
+            password="clsbsjgkvsvhihig",
+            smtp_server="smtp.qq.com",
+            port=587,
+            language="zh",
+        )
         # seed = random.randint(0, 1000)
         seed = 398
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
@@ -103,7 +112,7 @@ class System:
             "update_timestep": config.UPDATE_TIMESTEP,
             "total_update": config.MAX_TRAINING_STEPS / config.UPDATE_TIMESTEP,
             "lim-day": lim_day
-        })
+        },callbacks=[email_callback])
         # 1. PPO 超参数
         update_timestep = config.UPDATE_TIMESTEP
         # max_training_timesteps = config.MAX_TRAINING_STEPS
