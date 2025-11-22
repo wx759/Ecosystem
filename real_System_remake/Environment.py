@@ -3,8 +3,8 @@
 from real_System_remake.Enterprise import Enterprise
 from real_System_remake.Bank import Bank
 from real_System_remake.Market import Market
-from real_System_remake.ddpg_enterprise import enterprise_nnu
-from real_System_remake.ddpg_bank import bank_nnu
+# from real_System_remake.ddpg_enterprise import enterprise_nnu
+# from real_System_remake.ddpg_bank import bank_nnu
 from real_System_remake.Logger import Logger
 import copy
 import random
