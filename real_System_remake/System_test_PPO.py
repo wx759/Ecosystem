@@ -22,7 +22,7 @@ import torch.nn.functional as F
 from swanlab.plugin.notification import EmailCallback
 use_wandb = True
 use_rbtree = False
-lim_day = 300
+lim_day = 100
 # seed =125
 enterprise_ppo_config = Config_PPO(
     scope='',
