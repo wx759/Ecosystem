@@ -101,7 +101,9 @@ class System:
             "mini_batch": config.MINI_BATCH_SIZE,
             "update_timestep": config.UPDATE_TIMESTEP,
             "total_update": config.MAX_TRAINING_STEPS / config.UPDATE_TIMESTEP,
-            "lim-day": lim_day
+            "lim-day": lim_day,
+            "gamma":config.GAMMA,
+            "lambda":config.LAMDA
         })
         # 1. PPO 超参数
         update_timestep = config.UPDATE_TIMESTEP
