@@ -23,7 +23,7 @@ import torch.nn.functional as F
 from swanlab.plugin.notification import EmailCallback
 use_wandb = True
 use_rbtree = False
-lim_day = 100
+lim_day = 300
 # seed =125
 enterprise_ppo_config = Config_PPO(
     scope='',
@@ -475,7 +475,7 @@ class System:
 
 if __name__ == '__main__':
     # for i in range(3):
-    seeds_to_run=[398]
+    seeds_to_run=[936]
     for seed in seeds_to_run:
         print(f"=== 启动 seed={seed} 的实验 ===")
         system = System()
