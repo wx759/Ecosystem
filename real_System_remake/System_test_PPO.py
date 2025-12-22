@@ -227,10 +227,6 @@ class System:
 
             print("--- Update finished. ---")
             update_num += 1
-        # print("--- Training finished. Starting evaluation... ---")
-        # for i in range(100):
-        #     avg_len_det = self.evaluate_policy(episodes=10)
-        #     wandb.log({"eval/final_avg_len_det": avg_len_det})
         wandb.finish()
         # self.env.finish()
 
@@ -245,123 +241,6 @@ class System:
         torch.backends.cudnn.benchmark = False
         print(f"[INFO] Seed set to {seed}")
 
-    # def evaluate_policy(self, episodes=10):
-    #     lengths = []
-    #
-    #     for ep in range(episodes):
-    #         state = self.env.reset()
-    #         done = False
-    #         steps = 0
-    #
-    #         while not done:
-    #             action = {}
-    #
-    #             # 和 run 一样，按 target_key 取 state 的子部分
-    #             for target_key in self.e_execute:
-    #                 act = self.Agent[target_key].choose_action_deterministic(
-    #                     state[target_key]
-    #                 )
-    #                 action[target_key] = act
-    #
-    #             for target_key in self.b_execute:
-    #                 act= self.Agent[target_key].choose_action_deterministic(
-    #                     state[target_key]
-    #                 )
-    #                 action[target_key] = act
-    #
-    #             # 环境交互
-    #             self.env.step(action)
-    #             next_state, reward, done = self.env.observe()
-    #             steps += 1
-    #
-    #         lengths.append(steps)
-    #     avg_len = np.mean(lengths)
-    #     return avg_len
-    def evaluate_policy(self, episodes=20, deterministic=False, threshold=None, use_ema=False):
-        """
-        对当前训练好的策略进行评估。
-        参数：
-            episodes: 评估回合数
-            deterministic: 是否使用确定性策略（mu）
-            threshold: 若某回合存活天数 < threshold，则记录失败轨迹
-            use_ema: 是否使用 EMA 平滑权重（可选）
-        """
-
-        results = []
-        failure_records = []
-
-        # if use_ema:
-        #     for key in self.Agent:
-        #         if hasattr(self.Agent[key], "ema_params"):
-        #             load_ema_to_model(self.Agent[key].actor, self.Agent[key].ema_params)
-
-        print(f"\n开始评估: episodes={episodes}, deterministic={deterministic}, EMA={use_ema}")
-
-        for ep in range(episodes):
-            state = self.reset_with_noise()
-            done = False
-            day = 1
-            trajectory = []
-
-            while not done:
-                action = {}
-
-                # ======================
-                # 为每类 Agent 选择动作
-                # ======================
-                for target_key in self.e_execute:
-                    act = self.Agent[target_key].choose_action_deterministic(state[target_key])
-                    action[target_key] = act
-
-                for target_key in self.b_execute:
-                    act = self.Agent[target_key].choose_action_deterministic(state[target_key])
-                    action[target_key] = act
-
-                # 环境步进
-                self.env.step(action)
-                next_state, reward, done = self.env.observe()
-
-                trajectory.append({
-                    "day": day,
-                    "state": {k: state[k].tolist() if hasattr(state[k], 'tolist') else state[k] for k in state},
-                    "action": {k: action[k].tolist() for k in action},
-                    "reward": reward
-                })
-
-                state = next_state
-                day += 1
-
-            results.append(day)
-            print(f"  Episode {ep + 1}: survived {day} days")
-
-            # 记录失败轨迹
-            if threshold and day < threshold:
-                failure_records.append(trajectory)
-
-        # ========== 汇总统计 ==========
-        results = np.array(results)
-        res = {
-            "mean": float(np.mean(results)),
-            "std": float(np.std(results)),
-            "median": float(np.median(results)),
-            "min": int(np.min(results)),
-            "max": int(np.max(results)),
-            "pct5": float(np.percentile(results, 5)),
-            "pct95": float(np.percentile(results, 95))
-        }
-
-        print("\n=== 评估结果 ===")
-        for k, v in res.items():
-            print(f"{k}: {v}")
-
-        # ========== 保存失败轨迹 ==========
-        if failure_records:
-            filename = f"failures_eval_seed_200{self.seed if hasattr(self, 'seed') else 0}.json"
-            with open(filename, 'w', encoding='utf-8') as f:
-                json.dump(failure_records, f, ensure_ascii=False, indent=2)
-            print(f"失败轨迹已保存到 {filename}")
-
-        return res
 
     def collect_state_statistics(self, episodes=20):
         """
