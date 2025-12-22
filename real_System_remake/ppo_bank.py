@@ -48,3 +48,19 @@ class bank_nnu:
         critic_loss, actor_loss = self.bank.get_loss()
         avg_entropy, avg_clip_frac = self.bank.get_test_indicator()
         return critic_loss, actor_loss, avg_entropy, avg_clip_frac
+
+    def reset_window(self):
+        self.state_window.clear()
+
+    # 【新增方法】返回当前历史窗口的快照，用于评估前保存、评估后恢复。
+    #  必须可 deepcopy
+    def get_window_state(self):
+        return list(self.state_window)
+
+    # 恢复历史窗口快照（用于评估结束后继续训练未完成回合）。
+    def set_window_state(self, snapshot):
+        self.state_window.clear()
+        if snapshot is None:
+            return
+        for s in snapshot:
+            self.state_window.append(s)
