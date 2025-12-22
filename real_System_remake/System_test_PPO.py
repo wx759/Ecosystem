@@ -23,7 +23,7 @@ import torch.nn.functional as F
 from swanlab.plugin.notification import EmailCallback
 use_wandb = True
 use_rbtree = False
-lim_day = 300
+lim_day = 100
 # seed =125
 enterprise_ppo_config = Config_PPO(
     scope='',
@@ -83,9 +83,8 @@ class System:
         for key in self.execute:
             self.Agent[key] = None
         # 评估配置项
-        self.eval_interval_steps = 5000
-        self.eval_episodes = 5
-        self.eval_deterministic = False   # 默认 False
+        self.eval_interval_steps = 10000
+
 
     #新增“构建独立环境”的函数
     def _build_env(self, name: str):
@@ -106,18 +105,10 @@ class System:
 
     #新增窗口快照与恢复函数
     def _snapshot_agent_windows(self):
-        snap = {}
-        for k, agent in self.Agent.items():  #k是智能体名字
-            if hasattr(agent, "get_window_state"):
-                snap[k] = agent.get_window_state()
-            else:
-                snap[k] = None
-        return snap
+       pass
 
     def _restore_agent_windows(self, snap):
-        for k, agent in self.Agent.items():
-            if hasattr(agent, "set_window_state"):
-                agent.set_window_state(snap.get(k))
+       pass
 
     def evaluate_current_policy(self, steps: int,eval_episodes: int =50, deterministic: bool = False):
         """
@@ -129,8 +120,8 @@ class System:
         """
         import numpy as np
 
-        # 1) 保存训练窗口（关键）
-        window_snap = self._snapshot_agent_windows()
+        # 1) 保存训练窗口（关键） 这里不需要
+        self._snapshot_agent_windows()
 
         # 2) 评估前清空窗口（每个 eval episode 都从干净窗口开始）
         for agent in self.Agent.values():
@@ -157,7 +148,6 @@ class System:
         for target_name in self.e_execute:
             per_agent[target_name] = {
                 "eval_business": [],
-                # "business": [],
             }
         for target_name in self.b_execute:
             per_agent[target_name] = {
@@ -269,10 +259,10 @@ class System:
 
 
         # 用训练步数对齐横轴
-        wandb.log(wandb_payload, step=int(steps))
+        wandb.log(wandb_payload, step=int(steps/10000))
 
         # ========= 9) 恢复训练窗口（关键：继续未完成训练回合） =========
-        self._restore_agent_windows(window_snap)
+
         # 评估后：切回 train（继续训练必须做）
         for agent in self.Agent.values():
             if hasattr(agent, "enterprise"):

@@ -237,7 +237,7 @@ class Environment:
             wandb.log({"存活天数": self.day})
             self.day_sum += self.day
             self.day_max = max(self.day_max, self.day)
-            if self.episode % 100 == 0:
+            if self.episode % 100 == 0 and self.episode > 0:
                 wandb.log({"每一百回合平均存活天数": self.day_sum / 100})
                 wandb.log({"每一百回合最高存活天数": self.day_max})
                 self.day_max = 0
