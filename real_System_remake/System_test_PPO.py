@@ -213,11 +213,11 @@ class System:
             # 分企业收益：直接读 episode 末的 total_reward
             for target_name in self.e_execute:
                 total_reward = eval_env.Enterprise[target_name].total_reward  # dict: {'eval_business':..., 'business':...}
-                per_agent[target_name]["eval_business"].append(total_reward["eval_business"])
+                per_agent[target_name]["eval_business"].append(100 * total_reward["eval_business"])
 
             # 分银行收益：优先 WNDB，否则 sum(values)
             for target_name in self.b_execute:
-                trb = eval_env.Bank[target_name].total_reward["WNDB"]
+                trb = eval_env.Bank[target_name].total_reward["WNDB"] * 100
                 per_agent[target_name]["WNDB"].append(trb)
 
             # ========= 6) 汇总统计 =========
