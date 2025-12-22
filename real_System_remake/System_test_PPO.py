@@ -82,6 +82,206 @@ class System:
         self.Agent = {}
         for key in self.execute:
             self.Agent[key] = None
+        # 评估配置项
+        self.eval_interval_steps = 5000
+        self.eval_episodes = 5
+        self.eval_deterministic = False   # 默认 False
+
+    #新增“构建独立环境”的函数
+    def _build_env(self, name: str):
+        env = Environment(name=name, lim_day=lim_day)
+
+        for key in enterprise_add_list:
+            config = copy.deepcopy(enterprise_config)
+            config.name = key
+            config.output_name = enterprise_add_list[key]
+            env.add_enterprise_agent(config=config)
+
+        env.add_bank(bank_config)
+        env.add_enterprise_thirdmarket(name='production_thirdMarket', output_name='K', price=100)
+        env.add_enterprise_thirdmarket(name='consumption_thirdMarket', output_name='L', price=100)
+
+        env.init()
+        return env
+
+    #新增窗口快照与恢复函数
+    def _snapshot_agent_windows(self):
+        snap = {}
+        for k, agent in self.Agent.items():  #k是智能体名字
+            if hasattr(agent, "get_window_state"):
+                snap[k] = agent.get_window_state()
+            else:
+                snap[k] = None
+        return snap
+
+    def _restore_agent_windows(self, snap):
+        for k, agent in self.Agent.items():
+            if hasattr(agent, "set_window_state"):
+                agent.set_window_state(snap.get(k))
+
+    def evaluate_current_policy(self, steps: int,eval_episodes: int =50, deterministic: bool = False):
+        """
+        每次调用：用独立 eval_env 跑 self.eval_episodes 回合。
+        记录：
+          - 平均存活天数
+          - 破产率（terminated 占比）
+          - 综合收益：按你选的 A 口径，分别记录 enterprise 的 total_reward['eval_business'] / ['business']，以及 bank 的 total_reward（尽量兼容）
+        """
+        import numpy as np
+
+        # 1) 保存训练窗口（关键）
+        window_snap = self._snapshot_agent_windows()
+
+        # 2) 评估前清空窗口（每个 eval episode 都从干净窗口开始）
+        for agent in self.Agent.values():
+            if hasattr(agent, "reset_window"):
+                agent.reset_window()
+
+        for agent in self.Agent.values():
+            if hasattr(agent,"enterprise"):
+                agent.enterprise.actor.eval()
+                agent.enterprise.critic.eval()
+            if hasattr(agent,"bank"):
+                agent.bank.actor.eval()
+                agent.bank.critic.eval()
+
+        # 3) 创建独立评估环境（与训练环境完全分开）
+        eval_env = self._build_env(name=f"PPO_eval_at_{steps}")
+
+        survival_days = []
+        terminated_count = 0
+        truncated_count = 0
+        # 每个主体一个 dict，里面存每个 episode 的收益（后续取均值/方差）
+        per_agent = {}
+
+        for target_name in self.e_execute:
+            per_agent[target_name] = {
+                "eval_business": [],
+                # "business": [],
+            }
+        for target_name in self.b_execute:
+            per_agent[target_name] = {
+                "WNDB": [],  # 银行利润
+            }
+
+            # ========= 4) 开始评估回合 =========
+        for ep in range(eval_episodes):
+            state = eval_env.reset()
+            done = False
+
+            # 每个评估回合开始，也清空窗口，避免跨回合泄漏
+            for agent in self.Agent.values():
+                if hasattr(agent, "reset_window"):
+                    agent.reset_window()
+
+            while not done:
+                action = {}
+
+                # 企业动作
+                for k in self.e_execute:
+                    if deterministic:
+                        act = self.Agent[k].choose_action_deterministic(state[k])
+                    else:
+                        act, _, _, _ = self.Agent[k].choose_action(state[k])
+                    action[k] = act
+
+                # 银行动作
+                for k in self.b_execute:
+                    if deterministic:
+                        act = self.Agent[k].choose_action_deterministic(state[k])
+                    else:
+                        act, _, _, _ = self.Agent[k].choose_action(state[k])
+                    action[k] = act
+
+                eval_env.step(action)
+                next_state, reward, done, info = eval_env.observe()
+                state = next_state
+
+            # ========= 5) 回合结束统计 =========
+            is_terminated = bool(info.get("terminated", False))  # 破产（自然终止）
+            is_truncated = bool(info.get("truncated", False))  # 到达 lim_day 截断
+
+            # 推荐互斥归因：破产优先；否则才算截断
+            if is_terminated:
+                terminated_count += 1
+            elif is_truncated:
+                truncated_count += 1
+
+            # 存活天数（回合级）
+            survival_days.append(eval_env.day)
+
+            # 分企业收益：直接读 episode 末的 total_reward
+            for target_name in self.e_execute:
+                total_reward = eval_env.Enterprise[target_name].total_reward  # dict: {'eval_business':..., 'business':...}
+                per_agent[target_name]["eval_business"].append(total_reward["eval_business"])
+
+            # 分银行收益：优先 WNDB，否则 sum(values)
+            for target_name in self.b_execute:
+                trb = eval_env.Bank[target_name].total_reward["WNDB"]
+                per_agent[target_name]["WNDB"].append(trb)
+
+            # ========= 6) 汇总统计 =========
+        survival = np.array(survival_days, dtype=np.float32)
+
+        result = {
+            "steps": int(steps),
+            # "eval_episodes": int(eval_episodes),
+            # "deterministic": bool(deterministic),
+
+            "avg_survival_days": float(survival.mean()),
+
+            "terminated_count": int(terminated_count),
+            "truncated_count": int(truncated_count),
+            "bankruptcy_rate": float(terminated_count / max(1, eval_episodes)),
+            "truncated_rate": float(truncated_count / max(1, eval_episodes)),
+
+            "agents": {}
+        }
+
+        # 企业分别汇总
+        for target_name in self.e_execute:
+            eb = np.array(per_agent[target_name]["eval_business"], dtype=np.float32)
+            result["agents"][target_name] = {
+                "avg_total_eval_business": float(eb.mean()),
+            }
+
+        # 银行分别汇总
+        for target_name in self.b_execute:
+            bt = np.array(per_agent[target_name]["WNDB"], dtype=np.float32)
+            result["agents"][target_name] = {
+                "avg_total_reward": float(bt.mean()),
+            }
+
+        # ========= 7) wandb/swanlab 记录（按主体分别打点） =========
+        # 全局指标
+        wandb_payload = {
+            "eval/avg_survival_days": result["avg_survival_days"],
+            "eval/bankruptcy_rate": result["bankruptcy_rate"],
+        }
+
+        # 分企业
+        for target_name in self.e_execute:
+            wandb_payload[f"eval/{target_name}/avg_total_eval_business"] = result["agents"][target_name]["avg_total_eval_business"]
+
+        # 分银行
+        for target_name in self.b_execute:
+            wandb_payload[f"eval/{target_name}/avg_total_reward"] = result["agents"][target_name]["avg_total_reward"]
+
+
+        # 用训练步数对齐横轴
+        wandb.log(wandb_payload, step=int(steps))
+
+        # ========= 9) 恢复训练窗口（关键：继续未完成训练回合） =========
+        self._restore_agent_windows(window_snap)
+        # 评估后：切回 train（继续训练必须做）
+        for agent in self.Agent.values():
+            if hasattr(agent, "enterprise"):
+                agent.enterprise.actor.train()
+                agent.enterprise.critic.train()
+            if hasattr(agent, "bank"):
+                agent.bank.actor.train()
+                agent.bank.critic.train()
+        return result
 
     def run(self,seed=None):
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
@@ -139,6 +339,9 @@ class System:
             # --- 数据收集阶段 ---
             for _ in range(update_timestep):
                 time_step += 1
+                if time_step % self.eval_interval_steps == 0:
+                    print("start to evalute")
+                    self.evaluate_current_policy(steps=time_step)
                 action,log_prob,mus,sigmas = {}, {},{},{}
 
                 for target_key in self.e_execute:
