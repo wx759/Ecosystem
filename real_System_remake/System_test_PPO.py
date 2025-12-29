@@ -83,7 +83,9 @@ class System:
         for key in self.execute:
             self.Agent[key] = None
         # 评估配置项
-        self.eval_interval_steps = 10000
+        self.eval_interval_steps = 10000,
+        self.eval_deterministic = True,
+
 
 
     #新增“构建独立环境”的函数
@@ -330,8 +332,11 @@ class System:
             for _ in range(update_timestep):
                 time_step += 1
                 if time_step % self.eval_interval_steps == 0:
-                    print("start to evalute")
-                    self.evaluate_current_policy(steps=time_step)
+                    print("start to evaluate")
+                    if self.eval_deterministic:
+                        self.evaluate_current_policy(steps=time_step,eval_episodes=1,deterministic=True)
+                    else:
+                        self.evaluate_current_policy(steps=time_step,eval_episodes=50,deterministic=False)
                 action,log_prob,mus,sigmas = {}, {},{},{}
 
                 for target_key in self.e_execute:
@@ -547,7 +552,7 @@ class System:
 
 if __name__ == '__main__':
     # for i in range(3):
-    seeds_to_run=[936]
+    seeds_to_run=[936,981,891,125,777,888,999,123]
     for seed in seeds_to_run:
         print(f"=== 启动 seed={seed} 的实验 ===")
         system = System()

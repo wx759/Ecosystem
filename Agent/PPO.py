@@ -290,7 +290,6 @@ class PPO:
             # if stop_all:
             #         break
 
-
             # 【修改后】保存所有mini-batch损失的平均值，用于日志记录
             self.actor_loss = np.mean(actor_loss_list)
             self.critic_loss = np.mean(critic_loss_list)
@@ -367,7 +366,7 @@ class PPO:
             mu, std = self.actor(old_states_tensor)
             log_std_mean = torch.log(std).mean().item()
             v_pred = self.critic(old_states_tensor).squeeze(-1)
-            v_mean =v_pred.mean().item()
+            v_mean = v_pred.mean().item()
             v_std = v_pred.std().item()
 
             # 3. KL divergence（新旧策略分布差异）
@@ -396,14 +395,13 @@ class PPO:
                 })
 
     def choose_action_deterministic(self, state):
-        state = torch.tensor(state,dtype=torch.float).unsqueeze(0).to(self.device)
+        state = torch.tensor(state, dtype=torch.float).unsqueeze(0).to(self.device)
 
         with torch.no_grad():
             mu, sigma = self.actor(state)
             raw_action = mu
             # 约束动作范围（与训练时一致）
             action = torch.tanh(raw_action) * 0.5
-
         return action.cpu().numpy().flatten()
 
     # NEW: 对角高斯的解析 KL（按样本对动作维度求和）
