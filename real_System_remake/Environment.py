@@ -8,6 +8,7 @@ from real_System_remake.Market import Market
 from real_System_remake.Logger import Logger
 import copy
 import random
+import numpy as np
 from real_System_remake.Enterprise_config import Enterprise_config
 from real_System_remake.Bank_config import Bank_config
 import swanlab as wandb
@@ -72,6 +73,10 @@ class Environment:
         self.is_end = False
         self.terminated = False
         self.truncated = False
+        # ===== 评估阶段环境噪声开关（训练不受影响）=====
+        self.eval_noise_on = False  # 是否开启评估噪声
+        self.eval_noise_scale = 0.0  # 噪声强度，例如 0.03
+        self.eval_seed = None  # 本回合噪声随机种子
 
     def get_day(self):
         return self.day
@@ -139,11 +144,60 @@ class Environment:
         for key in self.action_controller['e_execute']:
             self.market.subscribe(self.Enterprise[key])
 
+    def set_eval_noise(self, on: bool, scale: float = 0.0, seed: int = None):
+        """
+        评估前调用：
+        on=True：开启环境初始条件扰动
+        scale：扰动强度（0.03 表示大约 3%）
+        seed：本回合随机种子（每个episode给不同seed）
+        """
+        self.eval_noise_on = on
+        self.eval_noise_scale = scale
+        self.eval_seed = seed
+
+    def _apply_eval_noise(self):
+        """
+        在 reset() 里调用：对企业/银行的初始条件加一点随机扰动，
+        让每个评估episode轨迹不同。
+        """
+        if (not self.eval_noise_on) or (self.eval_noise_scale <= 0):
+            return
+
+        # 用 seed 控制可复现
+        if self.eval_seed is not None:
+            np.random.seed(self.eval_seed)
+
+        s = self.eval_noise_scale
+
+        # 企业初始扰动：money/stock/price/next_price（第三方市场inf会自动跳过）
+        for e in self.Enterprise.values():
+            if np.isfinite(e.money):
+                e.money = max(0.0, e.money * (1.0 + np.random.normal(0, s)))
+            if np.isfinite(e.stock):
+                e.stock = max(0.0, e.stock * (1.0 + np.random.normal(0, s)))
+            if np.isfinite(e.WNDF):
+                e.WNDF = max(0.0, e.WNDF * (1.0 + np.random.normal(0, s)))
+            for target_name in e.shop_dir:
+                e.intention_policy[target_name] = max(0, e.intention_policy[target_name] * (1.0 + np.random.normal(0, s)))
+
+
+            # 价格扰动小一点，避免变化太大
+            if np.isfinite(e.price):
+                e.price = max(1e-6, e.price * (1.0 + np.random.normal(0, s * 0.5)))
+            if np.isfinite(e.next_price):
+                e.next_price = max(1e-6, e.next_price * (1.0 + np.random.normal(0, s * 0.5)))
+
+        # 银行初始扰动：fund
+        for b in self.Bank.values():
+            if np.isfinite(b.fund):
+                b.fund = max(0.0, b.fund * (1.0 + np.random.normal(0, s)))
+
     def reset(self):
         self.is_end = False
         self.terminated = False  # NEW
         self.truncated = False  # NEW
         self.new_episode()
+        self._apply_eval_noise()
         self.state = {}
         self.action = {}
         self.day = 0
