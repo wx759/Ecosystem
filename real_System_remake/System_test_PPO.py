@@ -84,8 +84,6 @@ class System:
         self.eval_interval_steps = 10000
         self.eval_deterministic = True
 
-
-
     #新增“构建独立环境”的函数
     def _build_env(self, name: str):
         env = Environment(name=name, lim_day=lim_day)
@@ -118,7 +116,7 @@ class System:
             if hasattr(agent, "set_window_state"):
                 agent.set_window_state(snap.get(k))
 
-    def evaluate_current_policy(self, steps: int,eval_episodes: int =50, deterministic: bool = False):
+    def evaluate_current_policy(self, steps: int, eval_episodes: int = 50, deterministic: bool = False):
         """
         每次调用：用独立 eval_env 跑 self.eval_episodes 回合。
         记录：
@@ -137,10 +135,10 @@ class System:
                 agent.reset_window()
 
         for agent in self.Agent.values():
-            if hasattr(agent,"enterprise"):
+            if hasattr(agent, "enterprise"):
                 agent.enterprise.actor.eval()
                 agent.enterprise.critic.eval()
-            if hasattr(agent,"bank"):
+            if hasattr(agent, "bank"):
                 agent.bank.actor.eval()
                 agent.bank.critic.eval()
 
@@ -163,7 +161,10 @@ class System:
             }
 
             # ========= 4) 开始评估回合 =========
+        base_eval_seed = 829
+        eval_noise = 0.05
         for ep in range(eval_episodes):
+            eval_env.set_eval_noise(True, scale=eval_noise, seed=base_eval_seed + ep)
             state = eval_env.reset()
             done = False
 
@@ -210,7 +211,8 @@ class System:
 
             # 分企业收益：直接读 episode 末的 total_reward
             for target_name in self.e_execute:
-                total_reward = eval_env.Enterprise[target_name].total_reward  # dict: {'eval_business':..., 'business':...}
+                total_reward = eval_env.Enterprise[
+                    target_name].total_reward  # dict: {'eval_business':..., 'business':...}
                 per_agent[target_name]["eval_business"].append(100 * total_reward["eval_business"])
 
             # 分银行收益：优先 WNDB，否则 sum(values)
@@ -259,15 +261,15 @@ class System:
 
         # 分企业
         for target_name in self.e_execute:
-            wandb_payload[f"eval/{target_name}/avg_total_eval_business"] = result["agents"][target_name]["avg_total_eval_business"]
+            wandb_payload[f"eval/{target_name}/avg_total_eval_business"] = result["agents"][target_name][
+                "avg_total_eval_business"]
 
         # 分银行
         for target_name in self.b_execute:
             wandb_payload[f"eval/{target_name}/avg_total_reward"] = result["agents"][target_name]["avg_total_reward"]
 
-
         # 用训练步数对齐横轴
-        wandb.log(wandb_payload, step=int(steps/10000))
+        wandb.log(wandb_payload, step=int(steps / 10000))
 
         # ========= 9) 恢复训练窗口（关键：继续未完成训练回合） =========
         self._restore_agent_windows(window_snap)
@@ -279,9 +281,10 @@ class System:
             if hasattr(agent, "bank"):
                 agent.bank.actor.train()
                 agent.bank.critic.train()
+        eval_env.set_eval_noise(False)
         return result
 
-    def run(self,seed=None):
+    def run(self, seed=None):
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
         wandb.init(project="CL_learn", workspace="wx829", config={
             "random_seed": seed,
@@ -311,7 +314,7 @@ class System:
         # 1. PPO 超参数
         update_timestep = config.UPDATE_TIMESTEP
         # max_training_timesteps = config.MAX_TRAINING_STEPS
-        total_step =config.total_step
+        total_step = config.total_step
         # 2. 初始化智能体
         _temp_state = self.env.reset()
         for target_key in self.e_execute:
@@ -329,11 +332,11 @@ class System:
                 config.set_state_dim(len(_temp_state[target_key]))
                 self.Agent[target_key] = bank_nnu(config)
 
-       # self.load_actor_only()
+        # self.load_actor_only()
         # 3. 开始训练循环
         state = self.env.reset()
         time_step = 0
-        update_num= 0
+        update_num = 0
         episode_num = 1
 
         while time_step < total_step:
@@ -344,20 +347,20 @@ class System:
                 if time_step % self.eval_interval_steps == 0:
                     print("start to evaluate")
                     if self.eval_deterministic:
-                        self.evaluate_current_policy(steps=time_step,eval_episodes=1,deterministic=True)
+                        self.evaluate_current_policy(steps=time_step, eval_episodes=50, deterministic=True)
                     else:
-                        self.evaluate_current_policy(steps=time_step,eval_episodes=50,deterministic=False)
-                action,log_prob,mus,sigmas = {}, {},{},{}
+                        self.evaluate_current_policy(steps=time_step, eval_episodes=50, deterministic=False)
+                action, log_prob, mus, sigmas = {}, {}, {}, {}
 
                 for target_key in self.e_execute:
-                    act, lp ,mu,sigma= self.Agent[target_key].choose_action(state[target_key])
-                    action[target_key], log_prob[target_key],mus[target_key],sigmas[target_key] = act, lp,mu,sigma
+                    act, lp, mu, sigma = self.Agent[target_key].choose_action(state[target_key])
+                    action[target_key], log_prob[target_key], mus[target_key], sigmas[target_key] = act, lp, mu, sigma
                 for target_key in self.b_execute:
-                    act, lp ,mu,sigma= self.Agent[target_key].choose_action(state[target_key])
-                    action[target_key], log_prob[target_key],mus[target_key],sigmas[target_key] = act, lp,mu,sigma
+                    act, lp, mu, sigma = self.Agent[target_key].choose_action(state[target_key])
+                    action[target_key], log_prob[target_key], mus[target_key], sigmas[target_key] = act, lp, mu, sigma
 
                 self.env.step(action)
-                next_state, reward, done_env,info = self.env.observe()
+                next_state, reward, done_env, info = self.env.observe()
 
                 # NEW: 为每个 agent 计算 next_value = V(next_state)
                 next_v = {}
@@ -409,7 +412,6 @@ class System:
                         self.Agent[target_key].reset_window()
                     episode_num += 1
 
-
             # --- 学习阶段 ---
             print(f"--- Timestep {time_step}. Updating policies... ---")
 
@@ -417,7 +419,7 @@ class System:
                 agent.learn(state[agent_key])
                 agent.clear_memory()
 
-            if use_wandb and update_num % 5 ==0 :
+            if use_wandb and update_num % 5 == 0:
                 critic_bank, actor_bank, avg_entropy_bank, clip_fraction_bank = self.Agent['bank1'].log()
                 critic_production1, actor_production1, avg_entropy_production1, clip_fraction_production1 = self.Agent[
                     'production1'].log()
@@ -454,7 +456,6 @@ class System:
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
         print(f"[INFO] Seed set to {seed}")
-
 
     def collect_state_statistics(self, episodes=20):
         """
@@ -535,7 +536,7 @@ class System:
         """
         保存所有智能体的 Actor 参数（仅用于评估）
         """
-        save_dir = save_dir + "_" +"lim_day="+str(lim_day) +"_seed="+str(seed)
+        save_dir = save_dir + "_" + "lim_day=" + str(lim_day) + "_seed=" + str(seed)
         os.makedirs(save_dir, exist_ok=True)
         for target_key in self.e_execute:
             agent = self.Agent[target_key]
@@ -549,7 +550,7 @@ class System:
             torch.save(agent.bank.actor.state_dict(), filename)
             print(f"[🎯] 已保存 {agent.scope} 的 actor 至 {filename}")
 
-    def load_actor_only(self, save_dir = "actors_only_lim_day=150_seed=451"):
+    def load_actor_only(self, save_dir="actors_only_lim_day=150_seed=451"):
         for target_key in self.e_execute:
             agent = self.Agent[target_key]
             path = os.path.join(save_dir, f"{agent.scope}_actor.pt")
@@ -566,9 +567,10 @@ class System:
                 agent.bank.actor.train()
                 print(f"[🎯] 加载 actor: {agent.scope}")
 
+
 if __name__ == '__main__':
     # for i in range(3):
-    seeds_to_run=[936,981,891,125,777,888,999,123]
+    seeds_to_run = [936, 981, 891, 125, 777, 888, 999, 123]
     for seed in seeds_to_run:
         print(f"=== 启动 seed={seed} 的实验 ===")
         system = System()
