@@ -161,10 +161,9 @@ class System:
             }
 
             # ========= 4) 开始评估回合 =========
-        base_eval_seed = 829
-        eval_noise = 0.05
+        eval_noise = 0.02
         for ep in range(eval_episodes):
-            eval_env.set_eval_noise(True, scale=eval_noise, seed=base_eval_seed + ep)
+            eval_env.set_eval_noise(True, scale=eval_noise)
             state = eval_env.reset()
             done = False
 
@@ -281,7 +280,6 @@ class System:
             if hasattr(agent, "bank"):
                 agent.bank.actor.train()
                 agent.bank.critic.train()
-        eval_env.set_eval_noise(False)
         return result
 
     def run(self, seed=None):

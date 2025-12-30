@@ -74,9 +74,8 @@ class Environment:
         self.terminated = False
         self.truncated = False
         # ===== 评估阶段环境噪声开关（训练不受影响）=====
-        self.eval_noise_on = False  # 是否开启评估噪声
-        self.eval_noise_scale = 0.0  # 噪声强度，例如 0.03
-        self.eval_seed = None  # 本回合噪声随机种子
+        self.eval_noise_on = True  # 是否开启评估噪声
+        self.eval_noise_scale = 0.02  # 噪声强度
 
     def get_day(self):
         return self.day
@@ -144,7 +143,7 @@ class Environment:
         for key in self.action_controller['e_execute']:
             self.market.subscribe(self.Enterprise[key])
 
-    def set_eval_noise(self, on: bool, scale: float = 0.0, seed: int = None):
+    def set_eval_noise(self, on: bool, scale: float = 0.0):
         """
         评估前调用：
         on=True：开启环境初始条件扰动
@@ -153,7 +152,6 @@ class Environment:
         """
         self.eval_noise_on = on
         self.eval_noise_scale = scale
-        self.eval_seed = seed
 
     def _apply_eval_noise(self):
         """
@@ -162,10 +160,6 @@ class Environment:
         """
         if (not self.eval_noise_on) or (self.eval_noise_scale <= 0):
             return
-
-        # 用 seed 控制可复现
-        if self.eval_seed is not None:
-            np.random.seed(self.eval_seed)
 
         s = self.eval_noise_scale
 
