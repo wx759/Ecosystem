@@ -137,11 +137,11 @@ def plot_combined_survival_days(
 if __name__ == "__main__":
     plot_combined_survival_days(
         excel_paths=[
-            r"D:\experiment\data\compare\survival_day\day.xlsx",
+            r"D:\experiment\data\compare\survival_day\day100_with_noise.xlsx",
             # r"D:\experiment\data\compare\bankruptcy\bankruptcy.xlsx",
-            r"D:\experiment\data\compare\production1\eval_business.xlsx",
-            r"D:\experiment\data\compare\consumption1\eval_business.xlsx",
-            r"D:\experiment\data\compare\bank\total_reward.xlsx",
+            r"D:\experiment\data\compare\production1\eval_business_with_noise.xlsx",
+            r"D:\experiment\data\compare\consumption1\eval_business_with_noise.xlsx",
+            r"D:\experiment\data\compare\bank\total_reward_with_noise.xlsx",
         ],
         save_dir=r"D:\experiment\results",
         filename="combined_result",
