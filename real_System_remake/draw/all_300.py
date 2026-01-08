@@ -137,15 +137,15 @@ def plot_combined_survival_days(
 if __name__ == "__main__":
     plot_combined_survival_days(
         excel_paths=[
-            r"D:\experiment\data\compare\survival_day\100.xlsx",
+            r"D:\experiment\data\compare\survival_day\300.xlsx",
             # r"D:\experiment\data\compare\bankruptcy\bankruptcy.xlsx",
-            r"D:\experiment\data\compare\production1\100.xlsx",
-            r"D:\experiment\data\compare\consumption1\100.xlsx",
-            r"D:\experiment\data\compare\bank\100.xlsx",
+            r"D:\experiment\data\compare\production1\300.xlsx",
+            r"D:\experiment\data\compare\consumption1\300.xlsx",
+            r"D:\experiment\data\compare\bank\300.xlsx",
         ],
         save_dir=r"D:\experiment\results",
-        filename="100",
-        save_format="png",
+        filename="300",
+        save_format="svg",
 
         # 每个子图的自定义设置
         titles=[
