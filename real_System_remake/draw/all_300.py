@@ -71,34 +71,48 @@ def plot_combined_survival_days(
         print(f"  MLP ({len(mlp_cols)}列): {mlp_cols}")
         print(f"  Transformer ({len(tf_cols)}列): {tf_cols}")
 
-        # 计算均值和标准差
-        td3_mean = df[td3_cols].mean(axis=1)
-        td3_std = df[td3_cols].std(axis=1)
+        # # 计算均值和标准差
+        # td3_mean = df[td3_cols].mean(axis=1)
+        # td3_std = df[td3_cols].std(axis=1)
+        #
+        # mlp_mean = df[mlp_cols].mean(axis=1)
+        # mlp_std = df[mlp_cols].std(axis=1)
+        #
+        # tf_mean = df[tf_cols].mean(axis=1)
+        # tf_std = df[tf_cols].std(axis=1)
+        # ===== TD3 =====
+        td3_median = df[td3_cols].median(axis=1)
+        td3_q25 = df[td3_cols].quantile(0.25, axis=1)
+        td3_q75 = df[td3_cols].quantile(0.75, axis=1)
 
-        mlp_mean = df[mlp_cols].mean(axis=1)
-        mlp_std = df[mlp_cols].std(axis=1)
+        # ===== PPO-MLP =====
+        mlp_median = df[mlp_cols].median(axis=1)
+        mlp_q25 = df[mlp_cols].quantile(0.25, axis=1)
+        mlp_q75 = df[mlp_cols].quantile(0.75, axis=1)
 
-        tf_mean = df[tf_cols].mean(axis=1)
-        tf_std = df[tf_cols].std(axis=1)
+        # ===== PPO-Transformer =====
+        tf_median = df[tf_cols].median(axis=1)
+        tf_q25 = df[tf_cols].quantile(0.25, axis=1)
+        tf_q75 = df[tf_cols].quantile(0.75, axis=1)
 
         ax = axes[idx]
 
         # 绘制TD3
-        ax.plot(steps, td3_mean, label=f'TD3 (n={len(td3_cols)})', color='C0', linewidth=2)
+        ax.plot(steps, td3_median, label=f'TD3 (n={len(td3_cols)})', color='C0', linewidth=2)
         if use_std[idx]:
-            ax.fill_between(steps, td3_mean - td3_std, td3_mean + td3_std,
+            ax.fill_between(steps, td3_q25,td3_q75,
                         color='C0', alpha=0.2)
 
         # 绘制MLP
-        ax.plot(steps, mlp_mean, label=f'PPO_MLP (n={len(mlp_cols)})', color='C1', linewidth=2)
+        ax.plot(steps, mlp_median, label=f'PPO_MLP (n={len(mlp_cols)})', color='C1', linewidth=2)
         if use_std[idx]:
-            ax.fill_between(steps, mlp_mean - mlp_std, mlp_mean + mlp_std,
+            ax.fill_between(steps, mlp_q25, mlp_q75,
                         color='C1', alpha=0.2)
 
         # 绘制Transformer
-        ax.plot(steps, tf_mean, label=f'PPO_Transformer (n={len(tf_cols)})', color='C2', linewidth=2)
+        ax.plot(steps, tf_median, label=f'PPO_Transformer (n={len(tf_cols)})', color='C2', linewidth=2)
         if use_std[idx]:
-            ax.fill_between(steps, tf_mean - tf_std, tf_mean + tf_std,
+            ax.fill_between(steps, tf_q25,tf_q75,
                         color='C2', alpha=0.2)
 
         # 设置log坐标（如果需要）
@@ -179,9 +193,9 @@ if __name__ == "__main__":
         ],
         use_std=[
             True,
-            False,
-            False,
-            False
+            True,
+            True,
+            True
         ],
         # 匹配模式
         td3_pattern='td',
