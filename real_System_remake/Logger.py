@@ -8,7 +8,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import time
 import shutil
 from pandas import DataFrame
-import swanlab as wandb
+import swanlab
 
 
 plt.rcParams["font.sans-serif"]=["SimHei"] #设置字体
@@ -343,7 +343,7 @@ class Logger:
         # for i in range(start,end):
         #     count += day[i]
         # res = count/100
-        # wandb.log({'每百回合/存活天数':res})
+        # swanlab.log({'每百回合/存活天数':res})
 
         # 每百回合累计收益
         #   enterprise
@@ -359,13 +359,13 @@ class Logger:
                         count += (reward[i] * enterprise_reward_mul)
                     res = count/100
                     if target_name == '生产企业1':
-                        wandb.log({'每百回合/综合收益/生产企业1':res})
+                        swanlab.log({'每百回合/综合收益/生产企业1':res})
                     elif target_name == '消费企业1':
-                        wandb.log({'每百回合/综合收益/消费企业1': res})
+                        swanlab.log({'每百回合/综合收益/消费企业1': res})
                     elif target_name == '生产企业2':
-                        wandb.log({'每百回合/综合收益/生产企业2':res})
+                        swanlab.log({'每百回合/综合收益/生产企业2':res})
                     else:
-                        wandb.log({'每百回合/综合收益/消费企业2': res})
+                        swanlab.log({'每百回合/综合收益/消费企业2': res})
         except KeyError:
             pass
         #    bank
@@ -379,7 +379,7 @@ class Logger:
         # else:
         #     res = count / 100
         res = count/100
-        wandb.log({'每百回合/累计利润/银行':res})
+        swanlab.log({'每百回合/累计利润/银行':res})
 
 
     def output_discount(self,target:str,data_name:str, start_at:int = 0, path:str = None, type:str = 'finish',agent_type:str = 'enterprise'):

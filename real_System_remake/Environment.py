@@ -11,7 +11,7 @@ import random
 import numpy as np
 from real_System_remake.Enterprise_config import Enterprise_config
 from real_System_remake.Bank_config import Bank_config
-import swanlab as wandb
+import swanlab
 
 third_market_price = 100
 enterprise_price = 8
@@ -50,10 +50,6 @@ class Environment:
         self.logger = None
         self.reward = None
         self.day_sum_smooth = day_sum_smooth
-        self.use_wandb = False
-        if self.use_wandb:
-            wandb.init(project="cortex22_anna", name=name, notes="Attention",
-                       config=wandb_config)
         self.name = name
         self.lim_day = lim_day
         self.logger_path = logger_path
@@ -282,19 +278,19 @@ class Environment:
     def observe(self):
         if self.is_end:
             print("第", self.episode, "回合 存活", self.day, "天")
-            wandb.log({"存活天数": self.day})
+            swanlab.log({"存活天数": self.day})
             self.day_sum += self.day
             self.day_max = max(self.day_max, self.day)
             if self.episode % 100 == 0 and self.episode > 0:
-                wandb.log({"每一百回合平均存活天数": self.day_sum / 100})
-                wandb.log({"每一百回合最高存活天数": self.day_max})
+                swanlab.log({"每一百回合平均存活天数": self.day_sum / 100})
+                swanlab.log({"每一百回合最高存活天数": self.day_max})
                 self.day_max = 0
                 self.day_sum = 0
             if self.episode >= 300:
                 self.day_sum_smooth += self.day
                 self.day_sum_smooth -= self.eday[self.episode % 300]
                 self.eday[self.episode % 300] = self.day
-                wandb.log({"每三百回合平均存活天数（平滑）": self.day_sum_smooth / 300})
+                swanlab.log({"每三百回合平均存活天数（平滑）": self.day_sum_smooth / 300})
             else:
                 self.day_sum_smooth += self.day
                 self.eday[self.episode] = self.day
@@ -479,7 +475,7 @@ class Environment:
     #     print("logger.tocsv")
     #     self.logger.to_csv()
     #     if self.use_wandb:
-    #         wandb.finish()
+    #         swanlab.finish()
 
     def __str__(self):
         res = ''

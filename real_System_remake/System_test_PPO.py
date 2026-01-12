@@ -9,7 +9,7 @@ import os
 import random
 import torch
 
-import swanlab as wandb
+import swanlab
 from Agent.Config_PPO import Config_PPO
 from real_System_remake.Bank_config import Bank_config
 from real_System_remake.Enterprise_config import Enterprise_config
@@ -251,9 +251,9 @@ class System:
                 "avg_total_reward": float(bt.mean()),
             }
 
-        # ========= 7) wandb/swanlab 记录（按主体分别打点） =========
+        # ========= 7)swanlab 记录（按主体分别打点） =========
         # 全局指标
-        wandb_payload = {
+        swanlab_payload = {
             "eval/avg_survival_days": result["avg_survival_days"],
             "eval/bankruptcy_rate": result["bankruptcy_rate"],
         }
@@ -265,10 +265,10 @@ class System:
 
         # 分银行
         for target_name in self.b_execute:
-            wandb_payload[f"eval/{target_name}/avg_total_reward"] = result["agents"][target_name]["avg_total_reward"]
+            swanlab_payload[f"eval/{target_name}/avg_total_reward"] = result["agents"][target_name]["avg_total_reward"]
 
         # 用训练步数对齐横轴
-        wandb.log(wandb_payload, step=int(steps / 10000))
+        swanlab.log(swanlab_payload, step=int(steps / 10000))
 
         # ========= 9) 恢复训练窗口（关键：继续未完成训练回合） =========
         self._restore_agent_windows(window_snap)
@@ -284,7 +284,7 @@ class System:
 
     def run(self, seed=None):
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
-        wandb.init(project="CL_learn", workspace="wx829", config={
+        swanlab.init(project="CL_learn", workspace="wx829", config={
             "random_seed": seed,
             "is_rms_state": config.is_rms_state,
             "is_rms_reward": config.is_rms_reward,
@@ -423,25 +423,25 @@ class System:
                     'production1'].log()
                 critic_consumption1, actor_consumption1, avg_entropy_consumption1, clip_fraction_consumption1 = \
                     self.Agent['consumption1'].log()
-                wandb.log({'actor_loss/bank1': actor_bank})
-                wandb.log({'actor_loss/production1': actor_production1})
-                wandb.log({'actor_loss/consumption1': actor_consumption1})
+                swanlab.log({'actor_loss/bank1': actor_bank})
+                swanlab.log({'actor_loss/production1': actor_production1})
+                swanlab.log({'actor_loss/consumption1': actor_consumption1})
 
-                wandb.log({'critic_loss/bank': critic_bank})
-                wandb.log({'critic_loss/production1': critic_production1})
-                wandb.log({'critic_loss/consumption1': critic_consumption1})
+                swanlab.log({'critic_loss/bank': critic_bank})
+                swanlab.log({'critic_loss/production1': critic_production1})
+                swanlab.log({'critic_loss/consumption1': critic_consumption1})
 
-                wandb.log({'avg_entropy/bank': avg_entropy_bank})
-                wandb.log({'avg_entropy/production1': avg_entropy_production1})
-                wandb.log({'avg_entropy/consumption1': avg_entropy_consumption1})
+                swanlab.log({'avg_entropy/bank': avg_entropy_bank})
+                swanlab.log({'avg_entropy/production1': avg_entropy_production1})
+                swanlab.log({'avg_entropy/consumption1': avg_entropy_consumption1})
 
-                wandb.log({'clip_fraction/bank': clip_fraction_bank})
-                wandb.log({'clip_fraction/production1': clip_fraction_production1})
-                wandb.log({'clip_fraction/consumption1': clip_fraction_consumption1})
+                swanlab.log({'clip_fraction/bank': clip_fraction_bank})
+                swanlab.log({'clip_fraction/production1': clip_fraction_production1})
+                swanlab.log({'clip_fraction/consumption1': clip_fraction_consumption1})
 
             print("--- Update finished. ---")
             update_num += 1
-        wandb.finish()
+        swanlab.finish()
         # self.env.finish()
 
     @staticmethod
