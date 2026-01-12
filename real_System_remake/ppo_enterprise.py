@@ -122,6 +122,24 @@ class enterprise_nnu:
     def get_value(self, state):  # NEW
         return self.enterprise.get_value(state)
 
+    def get_next_value(self, raw_next_state):
+        """
+        计算 V(s_{t+1})（严格版）：
+        - 要求当前 state_window 非空（否则说明调用顺序不对）
+        - 使用 state_window 的快照 + raw_next_state 构造 next_seq_state（不污染真实窗口）
+        - 把 next_seq_state 交给 PPO.get_value（其内部会加 batch 维 -> (1,S,D)）
+        """
+        assert len(self.state_window) > 0, (
+            f"[{self.scope}] state_window is empty when computing next_value; "
+            f"call choose_action() first."
+        )
+
+        tmp = deque(self.state_window, maxlen=self.seq_len)
+        tmp.append(raw_next_state)  # 推进到 t+1
+
+        next_seq_state = np.array(tmp, dtype=np.float64)  # 与你 PPO.get_value dtype 习惯一致
+        return self.enterprise.get_value(next_seq_state)
+
     def learn(self, last_value):
         # --- 【新增】函数 ---
         self.enterprise.learn(last_value, agent_type=self.scope)

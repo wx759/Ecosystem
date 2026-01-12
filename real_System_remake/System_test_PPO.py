@@ -363,9 +363,9 @@ class System:
                 # NEW: 为每个 agent 计算 next_value = V(next_state)
                 next_v = {}
                 for k in self.e_execute:
-                    next_v[k] = self.Agent[k].get_value(next_state[k])
+                    next_v[k] = self.Agent[k].get_next_value(next_state[k])
                 for k in self.b_execute:
-                    next_v[k] = self.Agent[k].get_value(next_state[k])
+                    next_v[k] = self.Agent[k].get_next_value(next_state[k])
 
                 # NEW: 双掩码
                 is_terminated = bool(info.get('terminated', done_env))  # 自然终止才截断 bootstrap

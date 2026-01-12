@@ -6,9 +6,9 @@ import torch.nn.functional as F
 from torch.distributions import Normal
 from Agent import Config_PPO
 import numpy as np
-
+from collections import deque
 from Agent.RuningMeanStd import RunningMeanStd
-import swanlab as wandb
+import swanlab
 from torch.optim.lr_scheduler import LinearLR
 
 
@@ -391,21 +391,21 @@ class PPO:
             new_logprobs = self.compute_log_prob(mu, std, old_actions)
             kl = (old_logprobs - new_logprobs).mean().item()
             if agent_type == 'production1':
-                wandb.log({
+                swanlab.log({
                     "log_std_mean/production1": log_std_mean,
                     "KL_divergence/production1": kl,
                     "critic_mean/production1": v_mean,
                     "critic_std/production1": v_std,
                 })
             elif agent_type == 'consumption1':
-                wandb.log({
+                swanlab.log({
                     "log_std_mean/consumption1": log_std_mean,
                     "KL_divergence/consumption1": kl,
                     "critic_mean/consumption1": v_mean,
                     "critic_std/consumption1": v_std,
                 })
             else:
-                wandb.log({
+                swanlab.log({
                     "log_std_mean/bank": log_std_mean,
                     "KL_divergence/bank": kl,
                     "critic_mean/bank": v_mean,
