@@ -260,7 +260,7 @@ class System:
 
         # 分企业
         for target_name in self.e_execute:
-            wandb_payload[f"eval/{target_name}/avg_total_eval_business"] = result["agents"][target_name][
+            swanlab_payload[f"eval/{target_name}/avg_total_eval_business"] = result["agents"][target_name][
                 "avg_total_eval_business"]
 
         # 分银行
