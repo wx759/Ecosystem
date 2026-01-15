@@ -143,7 +143,7 @@ def plot_combined_survival_days(
     if save_dir is not None:
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        save_path = os.path.join(save_dir, f"{filename}.{save_format}")
+        save_path = os.path.join(save_dir, f"{filename}_{method}.{save_format}")
     else:
         save_path = f"{filename}.{save_format}"
 
@@ -165,7 +165,7 @@ if __name__ == "__main__":
             r"D:\experiment\data\compare\bank\300.xlsx",
         ],
         save_dir=r"D:\experiment\results",
-        filename="100",
+        filename="300",
         save_format="svg",
 
         # 每个子图的自定义设置
@@ -210,5 +210,5 @@ if __name__ == "__main__":
         tf_pattern='tf',
 
         ncols=2,  # 每行2个子图,
-        method='median'  # 绘图方式: 'mean' or 'median'
+        method='mean'  # 绘图方式: 'mean' or 'median'
     )

@@ -143,7 +143,7 @@ def plot_combined_survival_days(
     if save_dir is not None:
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        save_path = os.path.join(save_dir, f"{filename}.{save_format}")
+        save_path = os.path.join(save_dir, f"{filename}_{method}.{save_format}")
     else:
         save_path = f"{filename}.{save_format}"
 
@@ -210,5 +210,5 @@ if __name__ == "__main__":
         tf_pattern='tf',
 
         ncols=2,  # 每行2个子图,
-        method='mean'  # 绘图方式: 'mean' or 'median'
+        method='median'  # 绘图方式: 'mean' or 'median'
     )
