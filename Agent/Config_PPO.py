@@ -20,7 +20,7 @@ class Config_PPO:
                  # PPO核心参数
                  update_timestep: int = 2048,
                  max_training_steps: int = 2000000,
-                 total_step: int = 3500000,
+                 total_step: int = 2000000,
 
                  clip_range: float = 0.1,
                  n_epochs: int = 6,
