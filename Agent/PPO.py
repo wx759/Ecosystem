@@ -69,7 +69,7 @@ class PPO:
         # self.critic = ValueNet(self.state_dim, self.hidden_dim).to(self.device)
         # === 修改网络初始化逻辑 ===
         # 如果配置了 seq_len > 1，说明要用时序模型
-        if hasattr(config, 'seq_len') and config.seq_len > 1:
+        if hasattr(config, 'seq_len') and config.seq_len >= 1:
             self.use_transformer = True
             self.actor = TransformerPolicyNet(
                 config.state_dim, config.hidden_dim, config.action_dim,

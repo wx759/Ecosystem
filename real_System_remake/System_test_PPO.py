@@ -568,7 +568,7 @@ class System:
 
 if __name__ == '__main__':
     # for i in range(3):
-    seeds_to_run = [378, 652, 894, 17, 512, 739, 83, 291, 956, 105, 421, 668, 33, 777, 184]
+    seeds_to_run = [105]
     for seed in seeds_to_run:
         print(f"=== 启动 seed={seed} 的实验 ===")
         system = System()

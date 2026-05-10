@@ -35,7 +35,7 @@ class Config_PPO:
                  # 随机种子
                  random_seed: int = None,
                  #transformer层参数
-                 seq_len: int = 3,  # 回顾过去10个时间步的数据
+                 seq_len: int = 5,  # 回顾过去10个时间步的数据
                  n_heads: int = 1,  # Transformer 多头注意力的头数
                  n_layers: int = 1,  # Transformer Encoder 层数
                  ):

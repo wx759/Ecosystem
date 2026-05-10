@@ -93,7 +93,7 @@ class enterprise_nnu:
             self.state_window.append(raw_state)
 
         # 2. 制作 Transformer 需要的 "State"
-        # shape: (10, 35)
+        # shape: (seq_len, 35)
         seq_state = np.array(self.state_window)
 
         # 3. 传给 Actor 选择动作

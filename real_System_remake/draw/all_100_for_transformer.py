@@ -19,9 +19,9 @@ def plot_combined_survival_days(
         ylabels=None,  # 每个子图的y轴标签列表
         use_log_scale=None,  # 每个子图是否使用log纵坐标列表
         use_std=None,  # 每个子图是否显示标准差列表
-        td3_pattern='td',
-        mlp_pattern='mlp',
-        tf_pattern='tf',
+        seq1_pattern='td',
+        seq3_pattern='mlp',
+        seq5_pattern='tf',
         ncols=2  # 每行显示几个子图
 ):
     """
@@ -61,53 +61,54 @@ def plot_combined_survival_days(
         steps = df['step'].values
 
         # 使用模糊匹配获取列名
-        td3_cols = get_columns_by_pattern(df, td3_pattern)
-        mlp_cols = get_columns_by_pattern(df, mlp_pattern)
-        tf_cols = get_columns_by_pattern(df, tf_pattern)
+        seq1_cols = get_columns_by_pattern(df, seq1_pattern)
+        seq3_cols = get_columns_by_pattern(df, seq3_pattern)
+        seq5_cols = get_columns_by_pattern(df, seq5_pattern)
 
         # 打印匹配到的列
         print(f"\n{titles[idx]} 匹配到的列：")
-        print(f"  TD3 ({len(td3_cols)}列): {td3_cols}")
-        print(f"  MLP ({len(mlp_cols)}列): {mlp_cols}")
-        print(f"  Transformer ({len(tf_cols)}列): {tf_cols}")
+        print(f"  seq1 ({len(seq1_cols)}列): {seq1_cols}")
+        print(f"  seq3 ({len(seq3_cols)}列): {seq3_cols}")
+        print(f"  seq5 ({len(seq5_cols)}列): {seq5_cols}")
 
         # 计算均值和标准差
-        td3_mean = df[td3_cols].mean(axis=1)
-        mlp_mean = df[mlp_cols].mean(axis=1)
-        tf_mean = df[tf_cols].mean(axis=1)
+        seq1_mean = df[seq1_cols].mean(axis=1)
+        seq3_mean = df[seq3_cols].mean(axis=1)
+        seq5_mean = df[seq5_cols].mean(axis=1)
         from scipy.stats import t
 
-        n_td3 = len(td3_cols)
-        n_mlp = len(mlp_cols)
-        n_tf = len(tf_cols)
+        n_seq1 = len(seq1_cols)
+        n_seq3 = len(seq3_cols)
+        n_seq5 = len(seq5_cols)
 
-        td3_std = df[td3_cols].std(axis=1)
-        mlp_std = df[mlp_cols].std(axis=1)
-        tf_std = df[tf_cols].std(axis=1)
+        seq1_std = df[seq1_cols].std(axis=1)
+        seq3_std = df[seq3_cols].std(axis=1)
+        seq5_std = df[seq5_cols].std(axis=1)
 
-        td3_ci = t.ppf(0.975, n_td3 - 1) * td3_std / np.sqrt(n_td3)
-        mlp_ci = t.ppf(0.975, n_mlp - 1) * mlp_std / np.sqrt(n_mlp)
-        tf_ci = t.ppf(0.975, n_tf - 1) * tf_std / np.sqrt(n_tf)
+        seq1_ci = t.ppf(0.975, n_seq1 - 1) * seq1_std / np.sqrt(n_seq1)
+        seq3_ci = t.ppf(0.975, n_seq3 - 1) * seq3_std / np.sqrt(n_seq3)
+        seq5_ci = t.ppf(0.975, n_seq5 - 1) * seq5_std / np.sqrt(n_seq5)
 
         ax = axes[idx]
 
         # 绘制TD3
-        # ax.plot(steps, td3_mean, label=f'TD3 (n={len(td3_cols)})', color='C0', linewidth=2)
-        # if use_std[idx]:
-        #     ax.fill_between(steps, td3_mean - td3_ci, td3_mean + td3_ci,
-        #                 color='C0', alpha=0.15)
+        ax.plot(steps, seq1_mean, label=f'seq1 (n={len(seq1_cols)})', color='C0', linewidth=2)
+        if use_std[idx]:
+            ax.fill_between(steps, seq1_mean - seq1_ci, seq1_mean + seq1_ci,
+                        color='C0', alpha=0.1)
 
         # 绘制MLP
-        ax.plot(steps, mlp_mean, label=f'PPO_MLP (n={len(mlp_cols)})', color='C1', linewidth=2)
+        ax.plot(steps, seq3_mean, label=f'seq3 (n={len(seq3_cols)})', color='C1', linewidth=2)
         if use_std[idx]:
-            ax.fill_between(steps, mlp_mean - mlp_ci, mlp_mean + mlp_ci,
-                        color='C1', alpha=0.15)
+            ax.fill_between(steps, seq3_mean - seq3_ci, seq3_mean + seq3_ci,
+                        color='C1', alpha=0.1
+                            )
 
         # 绘制Transformer
-        ax.plot(steps, tf_mean, label=f'PPO_Transformer (n={len(tf_cols)})', color='C2', linewidth=2)
+        ax.plot(steps, seq5_mean, label=f'seq5 (n={len(seq5_cols)})', color='C2', linewidth=2)
         if use_std[idx]:
-            ax.fill_between(steps, tf_mean - tf_ci, tf_mean + tf_ci,
-                        color='C2', alpha=0.15)
+            ax.fill_between(steps, seq5_mean - seq5_ci, seq5_mean + seq5_ci,
+                        color='C2', alpha=0.1)
 
         # 设置log坐标（如果需要）
         if use_log_scale[idx]:
@@ -151,10 +152,9 @@ if __name__ == "__main__":
             r"D:\experiment\data\compare\bank\bank.xlsx",
         ],
         save_dir=r"D:\experiment\results",
-        filename="MLP与Transformer对比",
+        filename="序列长度比较",
         save_format="png",
 
-        # 每个子图的自定义设置
         titles=[
             "(a) Survival Days",
             "(b) Enterprise A Performance",
@@ -176,9 +176,9 @@ if __name__ == "__main__":
         use_log_scale=[
             False,  # 第一张图不用log
             # False,
-            True,
-            True,
-            True
+            False,
+            False,
+            False
         ],
         use_std=[
             True,
@@ -187,9 +187,9 @@ if __name__ == "__main__":
             True
         ],
         # 匹配模式
-        td3_pattern='TD3',
-        mlp_pattern='PPO',
-        tf_pattern='tf_seq5',
+        seq1_pattern='tf_seq1',
+        seq3_pattern='Transformer',
+        seq5_pattern='tf_seq5',
 
         ncols=2  # 每行2个子图
     )
