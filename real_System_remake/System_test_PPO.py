@@ -284,8 +284,11 @@ class System:
 
     def run(self, seed=None):
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
-        swanlab.init(project="paper_draw", workspace="wx829",name=f"Transformer_seed{seed}_limday{lim_day}",config={
+        swanlab.init(project="paper_draw", workspace="wx829",name=f"{config.model_type}"
+                                                                  f""
+                                                                  f"{seed}_limday{lim_day}",config={
             "random_seed": seed,
+            "model_type":config.model_type,
             "is_rms_state": config.is_rms_state,
             "is_rms_reward": config.is_rms_reward,
             "max_training_steps": config.MAX_TRAINING_STEPS,
@@ -568,7 +571,7 @@ class System:
 
 if __name__ == '__main__':
     # for i in range(3):
-    seeds_to_run = [105]
+    seeds_to_run = [956,291,83,739,512,117,894,652]
     for seed in seeds_to_run:
         print(f"=== 启动 seed={seed} 的实验 ===")
         system = System()

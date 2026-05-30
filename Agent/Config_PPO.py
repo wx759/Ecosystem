@@ -34,10 +34,13 @@ class Config_PPO:
 
                  # 随机种子
                  random_seed: int = None,
-                 #transformer层参数
+                 # 网络结构参数
+                 model_type: str = "lstm",
                  seq_len: int = 5,  # 回顾过去10个时间步的数据
                  n_heads: int = 1,  # Transformer 多头注意力的头数
                  n_layers: int = 1,  # Transformer Encoder 层数
+                 lstm_hidden_dim: int = 128,
+                 lstm_layers: int = 1,
                  ):
         
         self.total_step = total_step
@@ -70,10 +73,13 @@ class Config_PPO:
         self.is_rms_state = is_rms_state
         self.is_rms_reward = is_rms_reward
 
-        #transformer层参数
+        # 网络结构参数
+        self.model_type = model_type
         self.seq_len = seq_len
         self.n_heads = n_heads
         self.n_layers = n_layers
+        self.lstm_hidden_dim = lstm_hidden_dim
+        self.lstm_layers = lstm_layers
 
     def set_state_dim(self, state_dim: int):
         self.state_dim = state_dim
