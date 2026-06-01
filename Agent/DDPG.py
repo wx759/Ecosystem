@@ -372,19 +372,6 @@ class DDPG(object):
             # n_l5 = 10
 
 
-            # LSTM
-            n_lstm_units = 64  # lstm单元数量
-            # 创建lstm层
-            lstm_cell = tf.keras.layers.LSTMCell(units=n_lstm_units)
-            lstm_layer = tf.keras.layers.RNN(lstm_cell)
-            # 将状态s传递给lstm层
-            inputs = tf.concat([s,a],axis=-1)
-            lstm_output = lstm_layer(inputs)
-            new_inputs = tf.concat([inputs,lstm_output],axis=-1)
-
-
-
-
             # 权重矩阵w1_s，w1_a，偏置项b1
             w1_s = tf.get_variable('w1_s', [self.s_dim, n_l1], trainable=trainable)
             w1_a = tf.get_variable('w1_a', [self.a_dim, n_l1], trainable=trainable)

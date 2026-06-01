@@ -8,6 +8,7 @@ import numpy as np
 import os
 import random
 import torch
+import pandas as pd
 #test git
 #test git
 import swanlab as wandb
@@ -279,7 +280,7 @@ class System:
 
     def run(self, seed=None):
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
-        wandb.init(project="paper_draw", workspace="wx829",name=f"PPO_seed{seed}_limday{lim_day}", config={
+        wandb.init(project="simulation", workspace="wx829",name=f"PPO_seed{seed}_limday{lim_day}", config={
             "random_seed": seed,
             "is_rms_state": config.is_rms_state,
             "is_rms_reward": config.is_rms_reward,
@@ -515,23 +516,228 @@ class System:
 
         return noisy_state
 
-    def save_actors(self, save_dir="actors_only"):
+    def save_actors(self, save_dir="actors_only", seed=None):
         """
-        保存所有智能体的 Actor 参数（仅用于评估）
+        保存所有智能体的 Actor 参数（仅用于评估）。
+        文件命名格式：actor{seed}_{scope}_actor.pt
         """
-        save_dir = save_dir + "_" + "lim_day=" + str(lim_day) + "_seed=" + str(seed)
+        seed_str = str(seed) if seed is not None else "unknown"
+        save_dir = f"{save_dir}_lim_day={lim_day}_seed={seed_str}"
         os.makedirs(save_dir, exist_ok=True)
         for target_key in self.e_execute:
             agent = self.Agent[target_key]
-            filename = f"{save_dir}/{agent.scope}_actor.pt"
+            filename = os.path.join(save_dir, f"actor{seed_str}_{agent.scope}_actor.pt")
             torch.save(agent.enterprise.actor.state_dict(), filename)
             print(f"[🎯] 已保存 {agent.scope} 的 actor 至 {filename}")
 
         for target_key in self.b_execute:
             agent = self.Agent[target_key]
-            filename = f"{save_dir}/{agent.scope}_actor.pt"
+            filename = os.path.join(save_dir, f"actor{seed_str}_{agent.scope}_actor.pt")
             torch.save(agent.bank.actor.state_dict(), filename)
             print(f"[🎯] 已保存 {agent.scope} 的 actor 至 {filename}")
+
+    def _load_actor_from_checkpoint_dir(self, checkpoint_dir: str):
+        if not os.path.isdir(checkpoint_dir):
+            raise FileNotFoundError(f"checkpoint 目录不存在: {checkpoint_dir}")
+
+        self._ensure_agents_initialized()
+
+        loaded_files = []
+        for target_key in self.e_execute:
+            agent = self.Agent[target_key]
+            pattern = f"actor*_{agent.scope}_actor.pt"
+            matches = [name for name in os.listdir(checkpoint_dir) if name.endswith(f"_{agent.scope}_actor.pt") and name.startswith("actor")]
+            if len(matches) == 0:
+                raise FileNotFoundError(f"未找到 {agent.scope} 对应的 actor 文件: {checkpoint_dir}")
+            actor_path = os.path.join(checkpoint_dir, matches[0])
+            state_dict = torch.load(actor_path, map_location="cpu")
+            agent.enterprise.actor.load_state_dict(state_dict)
+            agent.enterprise.actor.eval()
+            for param in agent.enterprise.actor.parameters():
+                param.requires_grad = False
+            agent.enterprise.critic.eval()
+            for param in agent.enterprise.critic.parameters():
+                param.requires_grad = False
+            loaded_files.append(actor_path)
+
+        for target_key in self.b_execute:
+            agent = self.Agent[target_key]
+            matches = [name for name in os.listdir(checkpoint_dir) if name.endswith(f"_{agent.scope}_actor.pt") and name.startswith("actor")]
+            if len(matches) == 0:
+                raise FileNotFoundError(f"未找到 {agent.scope} 对应的 actor 文件: {checkpoint_dir}")
+            actor_path = os.path.join(checkpoint_dir, matches[0])
+            state_dict = torch.load(actor_path, map_location="cpu")
+            agent.bank.actor.load_state_dict(state_dict)
+            agent.bank.actor.eval()
+            for param in agent.bank.actor.parameters():
+                param.requires_grad = False
+            agent.bank.critic.eval()
+            for param in agent.bank.critic.parameters():
+                param.requires_grad = False
+            loaded_files.append(actor_path)
+
+        return loaded_files
+
+    def _ensure_agents_initialized(self, seed=None):
+        if all(self.Agent.get(key) is not None for key in self.execute):
+            return
+
+        _temp_state = self.env.reset()
+        for target_key in self.e_execute:
+            if self.Agent[target_key] is None:
+                config = copy.deepcopy(enterprise_ppo_config)
+                config.set_scope(target_key)
+                config.set_seed(seed if seed is not None else 0)
+                config.set_state_dim(len(_temp_state[target_key]))
+                self.Agent[target_key] = enterprise_nnu(config)
+        for target_key in self.b_execute:
+            if self.Agent[target_key] is None:
+                config = copy.deepcopy(bank_ppo_config)
+                config.set_scope(target_key)
+                config.set_seed(seed if seed is not None else 0)
+                config.set_state_dim(len(_temp_state[target_key]))
+                self.Agent[target_key] = bank_nnu(config)
+
+    def evaluate_final_policy_with_trajectory(self, checkpoint_path="C:\\Users\\20260520010\\PycharmProjects\\Ecosystem\\real_System_remake\\actors_only_lim_day=100_seed=378", eval_episodes=20, deterministic=True,
+                                              eval_noise=0.02, output_dir=None):
+        """
+        训练完成后，加载指定 checkpoint 目录中的最终 actor 参数，并评估轨迹。
+        生成:
+          - trajectory_raw.csv: 每天每个企业的原始指标
+          - trajectory_metrics.csv: 每天系统级指标
+        """
+        started_eval_run = True
+        wandb.init(
+            project="final_simulation_trajectory",
+            workspace="wx829",
+            name="PPO_MLP",
+            mode=os.getenv("SWANLAB_MODE", "local"),
+        )
+
+        checkpoint_dir = checkpoint_path if os.path.isdir(checkpoint_path) else os.path.dirname(checkpoint_path)
+        if output_dir is None:
+            output_dir = checkpoint_dir if checkpoint_dir else os.getcwd()
+        os.makedirs(output_dir, exist_ok=True)
+
+        # 1) 构建/补齐 agent，并加载最终模型
+        loaded_files = self._load_actor_from_checkpoint_dir(checkpoint_dir)
+        print(f"[INFO] 已加载 checkpoint: {loaded_files}")
+
+        # 2) 评估前冻结模型，切换到 eval
+        for agent in self.Agent.values():
+            if hasattr(agent, "enterprise"):
+                agent.enterprise.actor.eval()
+                agent.enterprise.critic.eval()
+                for param in agent.enterprise.actor.parameters():
+                    param.requires_grad = False
+                for param in agent.enterprise.critic.parameters():
+                    param.requires_grad = False
+            if hasattr(agent, "bank"):
+                agent.bank.actor.eval()
+                agent.bank.critic.eval()
+                for param in agent.bank.actor.parameters():
+                    param.requires_grad = False
+                for param in agent.bank.critic.parameters():
+                    param.requires_grad = False
+
+        # 3) 保存并清空窗口
+        self._snapshot_agent_windows()
+        for agent in self.Agent.values():
+            if hasattr(agent, "reset_window"):
+                agent.reset_window()
+
+        eval_env = self._build_env(name="PPO_final_eval")
+        raw_rows = []
+        metric_rows = []
+        episode_survival_days = []
+
+        for ep in range(eval_episodes):
+            eval_env.set_eval_noise(True, scale=eval_noise)
+            state = eval_env.reset()
+            done = False
+
+            for agent in self.Agent.values():
+                if hasattr(agent, "reset_window"):
+                    agent.reset_window()
+
+            while not done:
+                action = {}
+                for k in self.e_execute:
+                    if deterministic:
+                        act = self.Agent[k].choose_action_deterministic(state[k])
+                    else:
+                        act, _, _, _ = self.Agent[k].choose_action(state[k])
+                    action[k] = act
+                for k in self.b_execute:
+                    if deterministic:
+                        act = self.Agent[k].choose_action_deterministic(state[k])
+                    else:
+                        act, _, _, _ = self.Agent[k].choose_action(state[k])
+                    action[k] = act
+
+                eval_env.step(action)
+                next_state, reward, done, info = eval_env.observe()
+
+                current_day = eval_env.day
+                dscr_values = []
+                total_wn_df = 0.0
+                total_get_wn_df = 0.0
+                output_flags = []
+
+                for target_name in self.e_execute:
+                    ent = eval_env.Enterprise[target_name]
+                    dscr = ent.money / (ent.should_payback + ent.iDebt + 1e-8)
+                    dscr_values.append(dscr)
+                    total_wn_df += ent.WNDF
+                    total_get_wn_df += ent.get_WNDF
+                    output_flags.append(float(ent.output >= 0.1))
+                    raw_rows.append({
+                        "episode": ep + 1,
+                        "day": current_day,
+                        "firm": target_name,
+                        "money": ent.money,
+                        "should_payback": ent.should_payback,
+                        "iDebt": ent.iDebt,
+                        "WNDF": ent.WNDF,
+                        "get_WNDF": ent.get_WNDF,
+                        "output": ent.output,
+                        "DSCR": dscr,
+                        "terminated": int(bool(info.get("terminated", False))),
+                        "truncated": int(bool(info.get("truncated", False))),
+                    })
+
+                metric_rows.append({
+                    "episode": ep + 1,
+                    "day": current_day,
+                    "min_DSCR": min(dscr_values) if dscr_values else 0.0,
+                    "loan_fill": total_get_wn_df / (total_wn_df + 1e-8),
+                    "output_continuity": float(np.mean(output_flags)) if output_flags else 0.0,
+                    "terminated": int(bool(info.get("terminated", False))),
+                    "truncated": int(bool(info.get("truncated", False))),
+                })
+
+                state = next_state
+
+            episode_survival_days.append(eval_env.day)
+
+        raw_df = pd.DataFrame(raw_rows)
+        metrics_df = pd.DataFrame(metric_rows)
+        raw_path = os.path.join(output_dir, "trajectory_raw.csv")
+        metrics_path = os.path.join(output_dir, "trajectory_metrics.csv")
+        raw_df.to_csv(raw_path, index=False, encoding="utf-8-sig")
+        metrics_df.to_csv(metrics_path, index=False, encoding="utf-8-sig")
+
+        print(f"[INFO] trajectory_raw.csv saved to {raw_path}")
+        print(f"[INFO] trajectory_metrics.csv saved to {metrics_path}")
+        if started_eval_run:
+            wandb.finish()
+        return {
+            "checkpoint_dir": checkpoint_dir,
+            "raw_path": raw_path,
+            "metrics_path": metrics_path,
+            "avg_survival_days": float(np.mean(episode_survival_days)) if episode_survival_days else 0.0,
+            "eval_episodes": eval_episodes,
+        }
 
     def load_actor_only(self, save_dir="actors_only_lim_day=150_seed=451"):
         for target_key in self.e_execute:
@@ -553,13 +759,12 @@ class System:
 
 if __name__ == '__main__':
     # for i in range(3):
-    seeds_to_run = [378, 652, 894, 17, 512, 739, 83, 291, 956, 105, 421, 668, 33, 777, 184]
+    seeds_to_run = [378, 652, 894, 17, 512]
     for seed in seeds_to_run:
         print(f"=== 启动 seed={seed} 的实验 ===")
         system = System()
         system.run(seed=seed)
-        # system.save_actors()
-        # system.evaluate_policy(episodes=500, deterministic=False, threshold=180)
+        system.save_actors(seed=seed)
         del system
         gc.collect()
         # 清空计算图

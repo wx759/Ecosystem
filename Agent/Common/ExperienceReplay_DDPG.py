@@ -14,7 +14,10 @@ from copy import deepcopy as COPY
 import numpy as np
 
 file_path = get_file_path_from_name(__file__)
-_er_kernel = CDLL(file_path + '/../cpp_DDPG/bin/er_kernel.dll')
+try:
+    _er_kernel = CDLL(file_path + '/../cpp_DDPG/bin/er_kernel.dll')
+except OSError:
+    _er_kernel = None
 
 LH_EPI_T = c_int64
 LH_REC_T = c_uint64
@@ -30,25 +33,26 @@ REWARD_T = c_float
 PRIORITY_T = c_float
 SEQ_LEN_T = H_REC_T
 
-_ex_rp_new = _er_kernel.ex_rp_new
-_ex_rp_new.restype = PTR
-_ex_rp_del = _er_kernel.ex_rp_del
-_ex_rp_clear = _er_kernel.ex_rp_clear
-_ex_rp_serialize_size = _er_kernel.ex_rp_serialize_size
-_ex_rp_serialize_size.restype = c_uint64
-_ex_rp_serialize = _er_kernel.ex_rp_serialize
-_ex_rp_unserialize = _er_kernel.ex_rp_unserialize
-_ex_rp_get_pick_policy = _er_kernel.ex_rp_get_pick_policy
-_ex_rp_new_episode = _er_kernel.ex_rp_new_episode
-_ex_rp_new_episode.restype = LH_EPI_T
-_ex_rp_record = _er_kernel.ex_rp_record
-_ex_rp_record.restype = LH_EPI_T
-_ex_rp_get_random_batch = _er_kernel.ex_rp_get_random_batch
-_ex_rp_get_random_batch.restype = c_int32
-_ex_rp_set_elimination_policy = _er_kernel.ex_rp_set_elimination_policy
-_ex_rp_set_pick_priority = _er_kernel.ex_rp_set_pick_priority
-_ex_rp_reset_pick_priorities = _er_kernel.ex_rp_reset_pick_priorities
-_ex_rp_del_pick_selector = _er_kernel.ex_rp_del_pick_selector
+if _er_kernel is not None:
+    _ex_rp_new = _er_kernel.ex_rp_new
+    _ex_rp_new.restype = PTR
+    _ex_rp_del = _er_kernel.ex_rp_del
+    _ex_rp_clear = _er_kernel.ex_rp_clear
+    _ex_rp_serialize_size = _er_kernel.ex_rp_serialize_size
+    _ex_rp_serialize_size.restype = c_uint64
+    _ex_rp_serialize = _er_kernel.ex_rp_serialize
+    _ex_rp_unserialize = _er_kernel.ex_rp_unserialize
+    _ex_rp_get_pick_policy = _er_kernel.ex_rp_get_pick_policy
+    _ex_rp_new_episode = _er_kernel.ex_rp_new_episode
+    _ex_rp_new_episode.restype = LH_EPI_T
+    _ex_rp_record = _er_kernel.ex_rp_record
+    _ex_rp_record.restype = LH_EPI_T
+    _ex_rp_get_random_batch = _er_kernel.ex_rp_get_random_batch
+    _ex_rp_get_random_batch.restype = c_int32
+    _ex_rp_set_elimination_policy = _er_kernel.ex_rp_set_elimination_policy
+    _ex_rp_set_pick_priority = _er_kernel.ex_rp_set_pick_priority
+    _ex_rp_reset_pick_priorities = _er_kernel.ex_rp_reset_pick_priorities
+    _ex_rp_del_pick_selector = _er_kernel.ex_rp_del_pick_selector
 
 class PickSelector:
     @staticmethod
@@ -64,17 +68,26 @@ class Experience_Replay:
     def __init__(self, max_record_num:int = 0, pick_len = None, allow_short_seq = None,isFloat=False,isFour = False):
         if pick_len is None: pick_len = -1
         if allow_short_seq is None: allow_short_seq = -1
-        self._kernel = PTR(_ex_rp_new(LH_REC_T(max_record_num),
-                                      SEQ_LEN_T(pick_len), c_int32(allow_short_seq)))
+        self._use_kernel = _er_kernel is not None
+        if self._use_kernel:
+            self._kernel = PTR(_ex_rp_new(LH_REC_T(max_record_num),
+                                          SEQ_LEN_T(pick_len), c_int32(allow_short_seq)))
+        else:
+            self._kernel = None
         self._mutex = BasicLock()
         self._state_shape = None
         self._action_shape = None
         self.isFloat=isFloat
         self.isFour = isFour
+        self._fallback_capacity = max_record_num
+        self._fallback_transitions = []
+        self._fallback_episodes = {}
+        self._fallback_next_epi = 0
 
     def __del__(self):
         self._mutex.unlock()
-        _ex_rp_del(self._kernel)
+        if self._use_kernel and self._kernel is not None:
+            _ex_rp_del(self._kernel)
 
     def get_pick_policy(self):
         pick_len = SEQ_LEN_T()
@@ -94,6 +107,13 @@ class Experience_Replay:
         self._mutex.unlock()
 
     def new_episode(self):
+        if not self._use_kernel:
+            self._mutex.lock()
+            h_epi = self._fallback_next_epi
+            self._fallback_next_epi += 1
+            self._fallback_episodes[h_epi] = []
+            self._mutex.unlock()
+            return h_epi
         self._mutex.lock()
         h_epi = _ex_rp_new_episode(self._kernel)
         self._mutex.unlock()
@@ -123,30 +143,73 @@ class Experience_Replay:
             return ret
         if h_epi is None: h_epi = -1
         if reward is None: reward = 0
-        if final_state is None: final_state = 0
-        else:
-            final_state = array(final_state).reshape([-1])
-            final_state = (STATE_T * len(final_state))(*final_state)
-            final_state = byref(final_state)
         state = array(state)
         action = array(action)
         self._mutex.lock()
         if self._state_shape is None: self._state_shape = list(state.shape)
         if self._action_shape is None: self._action_shape = list(action.shape)
+        if not self._use_kernel:
+            if h_epi == -1:
+                h_epi = self._fallback_next_epi
+                self._fallback_next_epi += 1
+                self._fallback_episodes[h_epi] = []
+            transition = (
+                state.reshape([-1]).astype(np.float32),
+                action.reshape([-1]).astype(np.float32),
+                float(reward),
+                None if final_state is None else array(final_state).reshape([-1]).astype(np.float32),
+            )
+            self._fallback_episodes.setdefault(h_epi, []).append(transition)
+            self._fallback_transitions.append(transition)
+            if self._fallback_capacity > 0 and len(self._fallback_transitions) > self._fallback_capacity:
+                self._fallback_transitions = self._fallback_transitions[-self._fallback_capacity:]
+            self._mutex.unlock()
+            return h_epi
+        if final_state is None: final_state = 0
+        else:
+            final_state = array(final_state).reshape([-1])
+            final_state = (STATE_T * len(final_state))(*final_state)
+            final_state = byref(final_state)
         state_size = reduce(int.__mul__, self._state_shape)
-        action_size = reduce(int.__mul__,self._action_shape)
+        action_size = reduce(int.__mul__, self._action_shape)
         state = state.reshape([-1])
         state = (STATE_T * state_size)(*state)
         action = action.reshape([-1])
         action = (ACTION_T * action_size)(*action)
-        # print("state_size",state_size,STATE_SIZE_T(state_size))
-        # print("action_size",action_size,ACTION_SIZE_T(action_size))
         h_epi = _ex_rp_record(self._kernel, LH_EPI_T(h_epi), state, action,
                               REWARD_T(reward), final_state, STATE_SIZE_T(state_size), ACTION_SIZE_T(action_size))
         self._mutex.unlock()
         return h_epi
 
     def get_random_batch(self, batch_size:int, valid_sample_rate:float = 0, h_ps = None):
+        if not self._use_kernel:
+            self._mutex.lock()
+            if len(self._fallback_transitions) == 0:
+                self._mutex.unlock()
+                return None
+            pick_len = 1
+            replace = len(self._fallback_transitions) < batch_size
+            indices = np.random.choice(len(self._fallback_transitions), size=batch_size, replace=replace)
+            batch_transitions = [self._fallback_transitions[i] for i in indices]
+            state = np.array([t[0] for t in batch_transitions], dtype=np.float32).reshape(batch_size, pick_len, -1)
+            action = np.array([t[1] for t in batch_transitions], dtype=np.float32).reshape(batch_size, pick_len, -1)
+            reward = np.array([t[2] for t in batch_transitions], dtype=np.float32).reshape(batch_size, pick_len)
+            state_ = np.array([
+                t[3] if t[3] is not None else t[0] for t in batch_transitions
+            ], dtype=np.float32).reshape(batch_size, pick_len, -1)
+            self._mutex.unlock()
+            h_s_len = np.ones(batch_size) * (pick_len - 1)
+            return dict(
+                s=state[:, pick_len - 1, :],
+                s_=state_[:, pick_len - 1, :],
+                a=action[:, pick_len - 1, :],
+                r=reward[:, pick_len - 1],
+                h_s=state[:, :pick_len - 1:],
+                h_a=action[:, :pick_len - 1:],
+                h_s_=state_[:, :pick_len - 1:],
+                h_a_=action[:, 1:pick_len:],
+                h_s_len=h_s_len
+            )
         if h_ps is None: h_ps = H_PS_T(0)
         self._mutex.lock()
         if self._state_shape is None:
