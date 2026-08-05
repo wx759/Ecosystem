@@ -533,6 +533,7 @@ class TransformerPolicyNet(torch.nn.Module):
         encoder_layer = torch.nn.TransformerEncoderLayer(
             d_model=hidden_dim,
             nhead=n_heads,
+            dim_feedforward=hidden_dim * 4,
             batch_first=True  # 关键: 输入格式为 [batch, seq, feature]
         )
         self.transformer_encoder = torch.nn.TransformerEncoder(encoder_layer, num_layers=n_layers)
@@ -569,7 +570,12 @@ class TransformerValueNet(torch.nn.Module):
         self.embedding = torch.nn.Linear(state_dim, hidden_dim)
         self.pos_embedding = torch.nn.Parameter(torch.randn(1, seq_len, hidden_dim))
 
-        encoder_layer = torch.nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=n_heads, batch_first=True)
+        encoder_layer = torch.nn.TransformerEncoderLayer(
+            d_model=hidden_dim,
+            nhead=n_heads,
+            dim_feedforward=hidden_dim * 4,
+            batch_first=True,
+        )
         self.transformer_encoder = torch.nn.TransformerEncoder(encoder_layer, num_layers=n_layers)
 
         self.fc_out = torch.nn.Linear(hidden_dim, 1)

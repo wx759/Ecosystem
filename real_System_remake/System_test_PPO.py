@@ -287,7 +287,7 @@ class System:
 
     def run(self, seed=None):
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
-        swanlab.init(project="paper_draw", workspace="wx829",name=f"{config.model_type}"
+        swanlab.init(project="retry_transformer_multi_head", workspace="wx829",name=f"{config.model_type}"
                                                                   f""
                                                                   f"{seed}_limday{lim_day}",config={
             "random_seed": seed,

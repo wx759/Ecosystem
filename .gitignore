@@ -1,0 +1,87 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments and local environment files
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# IDE and OS metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Saved models and checkpoints
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.safetensors
+*.h5
+*.hdf5
+*.joblib
+*.pkl
+*.pickle
+checkpoints/
+models/
+saved_models/
+
+# Training runs, experiment tracking, and generated logs
+runs/
+logs/
+wandb/
+swanlog/
+lightning_logs/
+events.out.tfevents.*
+*.log
+
+# Generated output and temporary files
+output/
+outputs/
+results/
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# C/C++ and Visual Studio build artifacts
+.vs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+cmake-build-*/
+*.obj
+*.o
+*.pch
+*.pdb
+*.ilk
+*.idb
+*.tlog
+*.exp
+*.lib
+*.suo
+*.user
+*.VC.db
+*.vsidx
+*.recipe
+
