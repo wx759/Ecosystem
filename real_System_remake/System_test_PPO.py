@@ -289,7 +289,7 @@ class System:
         config = Config_PPO(scope='', state_dim=0, action_dim=0, hidden_dim=0)
         swanlab.init(project="retry_transformer_multi_head", workspace="wx829",name=f"{config.model_type}"
                                                                   f""
-                                                                  f"{seed}_limday{lim_day}",config={
+                                                                  f"{seed}_limday{lim_day}_seq{config.seq_len}",config={
             "random_seed": seed,
             "model_type":config.model_type,
             "is_rms_state": config.is_rms_state,

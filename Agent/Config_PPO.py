@@ -19,8 +19,8 @@ class Config_PPO:
 
                  # PPO核心参数
                  update_timestep: int = 2048,
-                 max_training_steps: int = 200000,
-                 total_step: int = 200000,
+                 max_training_steps: int = 2000000,
+                 total_step: int = 2000000,
 
                  clip_range: float = 0.1,
                  n_epochs: int = 6,
@@ -36,7 +36,7 @@ class Config_PPO:
                  random_seed: int = None,
                  # 网络结构参数
                  model_type: str = "transformer",
-                 seq_len: int = 5,  # 回顾过去10个时间步的数据
+                 seq_len: int = 3,  # 回顾过去10个时间步的数据
                  n_heads: int = 4,  # Transformer 多头注意力的头数
                  n_layers: int = 1,  # Transformer Encoder 层数
                  lstm_hidden_dim: int = 128,
