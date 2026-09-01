@@ -9,7 +9,7 @@ def compute_final_performance(file_path, algo_name, last_n=20):
 
     df = pd.read_excel(file_path, engine="openpyxl")
 
-    cols = [col for col in df.columns if col.startswith(algo_name)]
+    cols = [col for col in df.columns if str(col).lower().find(str(algo_name).lower()) != -1]
 
     seed_means = []
 
@@ -53,20 +53,20 @@ def compute_final_performance(file_path, algo_name, last_n=20):
 
 files = {
 
-    "Survival Days":r"D:\experiment\data\compare\survival_day\survival_day.xlsx",
+    "Survival Days":r"C:\Users\20260520010\Desktop\data\survival_day.xlsx",
 
-    "Reward_production": r"D:\experiment\data\compare\production1\production.xlsx",
+    "Reward_production": r"C:\Users\20260520010\Desktop\data\production.xlsx",
 
-    "Reward_consumption":r"D:\experiment\data\compare\consumption1\consumption.xlsx",
+    "Reward_consumption":r"C:\Users\20260520010\Desktop\data\consumption.xlsx",
 
-    "bank": r"D:\experiment\data\compare\bank\bank.xlsx",
+    "bank": r"C:\Users\20260520010\Desktop\data\bank.xlsx",
 
-    "bankruptcy_rate": r"D:\experiment\data\compare\bankruptcy\bankruptcy.xlsx"
+    "bankruptcy_rate": r"C:\Users\20260520010\Desktop\data\bankruptcy.xlsx"
 
 }
 
 
-algorithms = ["TD3", "PPO", "Transformer","tf_seq1","tf_seq5"]
+algorithms = ["TD3", "PPO", "seq1","seq3","seq5"]
 
 
 # ===== 批量计算 =====

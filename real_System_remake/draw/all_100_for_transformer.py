@@ -146,10 +146,10 @@ def plot_combined_survival_days(
 if __name__ == "__main__":
     plot_combined_survival_days(
         excel_paths=[
-            r"D:\experiment\data\compare\survival_day\survival_day.xlsx",
-            r"D:\experiment\data\compare\production1\production.xlsx",
-            r"D:\experiment\data\compare\consumption1\consumption.xlsx",
-            r"D:\experiment\data\compare\bank\bank.xlsx",
+            r"C:\Users\20260520010\Desktop\data\survival_day.xlsx",
+            r"C:\Users\20260520010\Desktop\data\production.xlsx",
+            r"C:\Users\20260520010\Desktop\data\consumption.xlsx",
+            r"C:\Users\20260520010\Desktop\data\bank.xlsx",
         ],
         save_dir=r"D:\experiment\results",
         filename="序列长度比较",
@@ -187,9 +187,9 @@ if __name__ == "__main__":
             True
         ],
         # 匹配模式
-        seq1_pattern='tf_seq1',
-        seq3_pattern='Transformer',
-        seq5_pattern='tf_seq5',
+        seq1_pattern='seq1',
+        seq3_pattern='seq3',
+        seq5_pattern='seq5',
 
         ncols=2  # 每行2个子图
     )

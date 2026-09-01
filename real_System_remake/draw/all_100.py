@@ -91,7 +91,7 @@ def plot_combined_survival_days(
 
         ax = axes[idx]
 
-        # 绘制TD3
+        #绘制TD3
         # ax.plot(steps, td3_mean, label=f'TD3 (n={len(td3_cols)})', color='C0', linewidth=2)
         # if use_std[idx]:
         #     ax.fill_between(steps, td3_mean - td3_ci, td3_mean + td3_ci,
@@ -103,7 +103,7 @@ def plot_combined_survival_days(
             ax.fill_between(steps, mlp_mean - mlp_ci, mlp_mean + mlp_ci,
                         color='C1', alpha=0.15)
 
-        # 绘制Transformer
+        # # 绘制Transformer
         ax.plot(steps, tf_mean, label=f'PPO_Transformer (n={len(tf_cols)})', color='C2', linewidth=2)
         if use_std[idx]:
             ax.fill_between(steps, tf_mean - tf_ci, tf_mean + tf_ci,
@@ -145,13 +145,13 @@ def plot_combined_survival_days(
 if __name__ == "__main__":
     plot_combined_survival_days(
         excel_paths=[
-            r"D:\experiment\data\compare\survival_day\survival_day.xlsx",
-            r"D:\experiment\data\compare\production1\production.xlsx",
-            r"D:\experiment\data\compare\consumption1\consumption.xlsx",
-            r"D:\experiment\data\compare\bank\bank.xlsx",
+            r"C:\Users\20260520010\Desktop\data\survival_day.xlsx",
+            r"C:\Users\20260520010\Desktop\data\production.xlsx",
+            r"C:\Users\20260520010\Desktop\data\consumption.xlsx",
+            r"C:\Users\20260520010\Desktop\data\bank.xlsx",
         ],
         save_dir=r"D:\experiment\results",
-        filename="MLP与Transformer对比",
+        filename="MLP与tf对比",
         save_format="png",
 
         # 每个子图的自定义设置
@@ -189,7 +189,7 @@ if __name__ == "__main__":
         # 匹配模式
         td3_pattern='TD3',
         mlp_pattern='PPO',
-        tf_pattern='tf_seq5',
+        tf_pattern='seq5',
 
         ncols=2  # 每行2个子图
     )
